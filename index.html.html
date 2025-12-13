@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- PWA iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BJ Counter">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230f2027' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dy='0.35em' fill='%234ade80'>♠</text></svg>">
+  
+  <!-- PWA Android -->
+  <meta name="theme-color" content="#0f2027">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" id="manifest-placeholder">
+  
+  <title>Blackjack Counter AI Pro</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    html {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      height: 100%;
+      padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: max(80px, env(safe-area-inset-bottom));
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-top: 16px;
+    }
+
+    .header h1 {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #4ade80, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      font-size: 12px;
+      opacity: 0.6;
+      font-weight: 600;
+    }
+
+    .main-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 9px;
+      opacity: 0.7;
+      margin-bottom: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-value.small {
+      font-size: 20px;
+    }
+
+    .stat-value.positive { 
+      color: #4ade80;
+      text-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+    }
+    .stat-value.negative { 
+      color: #ef4444;
+      text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    }
+    .stat-value.neutral { 
+      color: #60a5fa;
+    }
+
+    .target-tabs {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .target-tab {
+      padding: 10px 6px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      line-height: 1.2;
+      touch-action: manipulation;
+    }
+
+    .target-tab.active {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: #000;
+      border-color: transparent;
+      transform: scale(1.05);
+    }
+
+    .target-tab:active {
+      transform: scale(0.95);
+    }
+
+    .round-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .round-btn {
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      touch-action: manipulation;
+    }
+
+    .round-btn.start {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: #000;
+    }
+
+    .round-btn.end {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff;
+    }
+
+    .round-btn:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+
+    .round-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .card-btn {
+      aspect-ratio: 1;
+      font-size: 18px;
+      font-weight: 900;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.1s;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      touch-action: manipulation;
+    }
+
+    .card-btn.low { 
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+    }
+    .card-btn.mid { 
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    }
+    .card-btn.high { 
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .card-btn:active:not(:disabled) {
+      transform: scale(0.9);
+    }
+
+    .card-btn:disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+    }
+
+    .ai-recommendation {
+      background: linear-gradient(135deg, rgba(74, 222, 128, 0.15), rgba(34, 197, 94, 0.1));
+      border: 2px solid rgba(74, 222, 128, 0.3);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .ai-recommendation::before {
+      content: '🤖 AI';
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      opacity: 0.5;
+    }
+
+    .ai-title {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ai-action {
+      font-size: 24px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      text-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+    }
+
+    .ai-action.hit { color: #4ade80; }
+    .ai-action.stand { color: #60a5fa; }
+    .ai-action.double { color: #fbbf24; }
+    .ai-action.split { color: #a78bfa; }
+
+    .ai-details {
+      font-size: 11px;
+      opacity: 0.7;
+      line-height: 1.4;
+    }
+
+    .table-state {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hand {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hand:last-child {
+      margin-bottom: 0;
+    }
+
+    .hand-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .hand-name {
+      font-size: 11px;
+      font-weight: 700;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hand-total {
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .hand-total.bust { color: #ef4444; }
+    .hand-total.blackjack { color: #fbbf24; }
+
+    .hand-cards {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .mini-card {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .inactive-notice {
+      text-align: center;
+      opacity: 0.5;
+      font-size: 13px;
+      padding: 16px;
+      font-style: italic;
+    }
+
+    .quick-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .info-card {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .info-label {
+      font-size: 10px;
+      opacity: 0.6;
+      margin-bottom: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .info-value {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .reset-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      touch-action: manipulation;
+    }
+
+    .reset-btn:active {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(0.97);
+    }
+
+    .install-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      padding: 14px 20px;
+      padding-bottom: max(14px, calc(env(safe-area-inset-bottom) + 14px));
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      animation: slideUp 0.3s ease;
+    }
+
+    .install-banner.show {
+      display: flex;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .install-text {
+      color: #000;
+      font-weight: 800;
+      font-size: 13px;
+      flex: 1;
+    }
+
+    .install-btn {
+      background: rgba(0, 0, 0, 0.2);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      color: #000;
+      font-weight: 800;
+      font-size: 12px;
+      cursor: pointer;
+      margin-left: 10px;
+      touch-action: manipulation;
+    }
+
+    .install-close {
+      background: none;
+      border: none;
+      color: #000;
+      font-size: 22px;
+      cursor: pointer;
+      padding: 0 0 0 10px;
+      opacity: 0.7;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🤖 Blackjack AI Counter</h1>
+      <p>Estrategia Profesional • Hi-Lo System</p>
+    </div>
+
+    <div class="main-stats">
+      <div class="stat-card">
+        <div class="stat-label">RC</div>
+        <div class="stat-value neutral" id="runningCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">TC</div>
+        <div class="stat-value neutral" id="trueCount">0.0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Apuesta</div>
+        <div class="stat-value small neutral" id="betUnits">1x</div>
+      </div>
+    </div>
+
+    <div class="round-controls">
+      <button class="round-btn start" id="startRoundBtn" onclick="startRound()">
+        ▶️ Nueva Mano
+      </button>
+      <button class="round-btn end" id="endRoundBtn" onclick="endRound()" disabled>
+        ⏹️ Terminar
+      </button>
+    </div>
+
+    <div class="target-tabs">
+      <div class="target-tab active" data-target="me" onclick="selectTarget('me')">
+        🎮<br>Yo
+      </div>
+      <div class="target-tab" data-target="dealer" onclick="selectTarget('dealer')">
+        🃏<br>Dealer
+      </div>
+      <div class="target-tab" data-target="p1" onclick="selectTarget('p1')">
+        👤<br>P1
+      </div>
+      <div class="target-tab" data-target="p2" onclick="selectTarget('p2')">
+        👤<br>P2
+      </div>
+      <div class="target-tab" data-target="p3" onclick="selectTarget('p3')">
+        👤<br>P3
+      </div>
+    </div>
+
+    <div id="cardsGrid" class="cards-grid"></div>
+
+    <div class="ai-recommendation" id="aiRecommendation" style="display: none;">
+      <div class="ai-title">Jugada Óptima</div>
+      <div class="ai-action" id="aiAction">-</div>
+      <div class="ai-details" id="aiDetails">Esperando datos...</div>
+    </div>
+
+    <div class="table-state" id="tableState">
+      <div class="inactive-notice">
+        Presiona "Nueva Mano" para comenzar
+      </div>
+    </div>
+
+    <div class="quick-info">
+      <div class="info-card">
+        <div class="info-label">Cartas</div>
+        <div class="info-value" id="cardsPlayed">0/312</div>
+      </div>
+      <div class="info-card">
+        <div class="info-label">Mazos</div>
+        <div class="info-value" id="decksLeft">6.0</div>
+      </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetAll()">
+      ↻ Reset Total (Nueva Zapata)
+    </button>
+  </div>
+
+  <div class="install-banner" id="installBanner">
+    <span class="install-text">📱 Instalar en tu iPhone</span>
+    <button class="install-btn" onclick="showInstallHelp()">Cómo</button>
+    <button class="install-close" onclick="closeInstallBanner()">×</button>
+  </div>
+
+  <script>
+    // Manifest dinámico
+    const manifestData = {
+      name: "Blackjack Counter AI Pro",
+      short_name: "BJ Counter",
+      start_url: window.location.pathname,
+      display: "standalone",
+      background_color: "#0f2027",
+      theme_color: "#0f2027",
+      orientation: "portrait",
+      icons: [
+        {
+          src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%230f2027' width='512' height='512'/><text x='256' y='340' font-size='280' text-anchor='middle' fill='%234ade80'>♠</text></svg>",
+          sizes: "512x512",
+          type: "image/svg+xml",
+          purpose: "any maskable"
+        }
+      ]
+    };
+
+    const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+
+    // PWA Install
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('installBanner').classList.add('show');
+    });
+
+    function showInstallHelp() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+          closeInstallBanner();
+        });
+      } else {
+        // iOS - Mostrar instrucciones
+        alert('📱 Para instalar en iPhone:\n\n1. Toca el botón Compartir ⎙\n2. Desplázate y toca "Añadir a pantalla de inicio"\n3. Toca "Añadir"\n\n¡Listo! La app estará en tu pantalla de inicio.');
+      }
+    }
+
+    function closeInstallBanner() {
+      document.getElementById('installBanner').classList.remove('show');
+    }
+
+    // Detectar iOS y mostrar banner
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+    if (isIOS && !isStandalone) {
+      setTimeout(() => {
+        document.getElementById('installBanner').classList.add('show');
+      }, 2000);
+    }
+
+    // MODELO
+    const table = {
+      dealer: [],
+      players: { me: [], p1: [], p2: [], p3: [] },
+      roundActive: false
+    };
+
+    let runningCount = 0;
+    let cardsPlayed = 0;
+    let currentTarget = 'me';
+    const totalCards = 312;
+
+    const hiLoValues = {
+      '2': 1, '3': 1, '4': 1, '5': 1, '6': 1,
+      '7': 0, '8': 0, '9': 0,
+      '10': -1, 'J': -1, 'Q': -1, 'K': -1, 'A': -1
+    };
+
+    const cardValues = {
+      '2': 2, '3': 3, '4': 4, '5': 5, '6': 6,
+      '7': 7, '8': 8, '9': 9, '10': 10,
+      'J': 10, 'Q': 10, 'K': 10, 'A': 11
+    };
+
+    const allCards = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+    function selectTarget(target) {
+      currentTarget = target;
+      document.querySelectorAll('.target-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelector(`[data-target="${target}"]`).classList.add('active');
+    }
+
+    function addCard(card) {
+      if (!table.roundActive) return;
+
+      runningCount += hiLoValues[card];
+      cardsPlayed++;
+
+      if (currentTarget === 'dealer') {
+        table.dealer.push(card);
+      } else {
+        table.players[currentTarget].push(card);
+      }
+
+      if (navigator.vibrate) navigator.vibrate(5);
+
+      updateDisplay();
+      getAIRecommendation();
+    }
+
+    function handValue(hand) {
+      if (!hand || hand.length === 0) return 0;
+      let total = 0, aces = 0;
+      hand.forEach(c => {
+        if (c === 'A') { total += 11; aces++; }
+        else total += cardValues[c];
+      });
+      while (total > 21 && aces > 0) { total -= 10; aces--; }
+      return total;
+    }
+
+    function isBlackjack(hand) {
+      return hand.length === 2 && handValue(hand) === 21;
+    }
+
+    function canSplit(hand) {
+      if (hand.length !== 2) return false;
+      return cardValues[hand[0]] === cardValues[hand[1]];
+    }
+
+    function startRound() {
+      table.dealer = [];
+      Object.keys(table.players).forEach(p => table.players[p] = []);
+      table.roundActive = true;
+      document.getElementById('startRoundBtn').disabled = true;
+      document.getElementById('endRoundBtn').disabled = false;
+      document.querySelectorAll('.card-btn').forEach(b => b.disabled = false);
+      document.getElementById('aiRecommendation').style.display = 'none';
+      updateDisplay();
+    }
+
+    function endRound() {
+      table.roundActive = false;
+      document.getElementById('startRoundBtn').disabled = false;
+      document.getElementById('endRoundBtn').disabled = true;
+      document.querySelectorAll('.card-btn').forEach(b => b.disabled = true);
+      document.getElementById('aiRecommendation').style.display = 'none';
+      updateDisplay();
+    }
+
+    function resetAll() {
+      if (!confirm('¿Reset completo? Se borrará el conteo.')) return;
+      runningCount = 0;
+      cardsPlayed = 0;
+      table.dealer = [];
+      Object.keys(table.players).forEach(p => table.players[p] = []);
+      table.roundActive = false;
+      document.getElementById('startRoundBtn').disabled = false;
+      document.getElementById('endRoundBtn').disabled = true;
+      document.querySelectorAll('.card-btn').forEach(b => b.disabled = true);
+      document.getElementById('aiRecommendation').style.display = 'none';
+      updateDisplay();
+    }
+
+    function getAIRecommendation() {
+      const myHand = table.players.me;
+      const dealerHand = table.dealer;
+      
+      if (myHand.length === 0 || dealerHand.length === 0) {
+        document.getElementById('aiRecommendation').style.display = 'none';
+        return;
+      }
+
+      const myTotal = handValue(myHand);
+      const dealerUpcard = dealerHand[0];
+      const dealerValue = cardValues[dealerUpcard];
+      
+      const strategy = getBasicStrategy(myTotal, dealerValue, myHand);
+      
+      const recDiv = document.getElementById('aiRecommendation');
+      recDiv.style.display = 'block';
+      recDiv.innerHTML = `
+        <div class="ai-title">🤖 Estrategia Básica</div>
+        <div class="ai-action ${strategy.class}">${strategy.emoji} ${strategy.action}</div>
+        <div class="ai-details">${strategy.reason}</div>
+      `;
+    }
+
+    function getBasicStrategy(myTotal, dealerValue, myHand) {
+      if (isBlackjack(myHand)) {
+        return { action: 'STAND', class: 'stand', emoji: '🎉', reason: '¡Blackjack! Ya ganaste.' };
+      }
+
+      if (canSplit(myHand)) {
+        const card = myHand[0];
+        if (card === 'A' || card === '8') {
+          return { action: 'SPLIT', class: 'split', emoji: '✂️', reason: 'Siempre divide Ases y 8s.' };
+        }
+        if (card === '9' && dealerValue <= 6) {
+          return { action: 'SPLIT', class: 'split', emoji: '✂️', reason: 'Divide 9s vs dealer débil.' };
+        }
+      }
+
+      const hasAce = myHand.includes('A') && myTotal <= 21;
+      if (hasAce && myTotal < 19) {
+        if (myTotal >= 18 && dealerValue >= 9) {
+          return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Soft 18 vs alta: pide.' };
+        }
+        if (myTotal <= 17) {
+          return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Soft baja: pide.' };
+        }
+      }
+
+      if (myTotal >= 17) {
+        return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Total alto: plántate.' };
+      }
+
+      if (myTotal >= 12 && myTotal <= 16) {
+        if (dealerValue >= 2 && dealerValue <= 6) {
+          return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Dealer puede pasarse.' };
+        } else {
+          return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Dealer fuerte: mejora.' };
+        }
+      }
+
+      if (myTotal <= 11) {
+        if (myTotal === 11 && myHand.length === 2) {
+          return { action: 'DOUBLE', class: 'double', emoji: '💰', reason: '11 es ideal para doblar.' };
+        }
+        if (myTotal === 10 && myHand.length === 2 && dealerValue <= 9) {
+          return { action: 'DOUBLE', class: 'double', emoji: '💰', reason: '10 vs débil: dobla.' };
+        }
+        return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Total bajo: pide.' };
+      }
+
+      return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Jugada estándar.' };
+    }
+
+    function updateDisplay() {
+      const rcEl = document.getElementById('runningCount');
+      rcEl.textContent = runningCount > 0 ? '+' + runningCount : runningCount;
+      rcEl.className = 'stat-value';
+      if (runningCount > 0) rcEl.classList.add('positive');
+      else if (runningCount < 0) rcEl.classList.add('negative');
+      else rcEl.classList.add('neutral');
+
+      const decksRemaining = Math.max(0.5, (totalCards - cardsPlayed) / 52);
+      const trueCount = runningCount / decksRemaining;
+      const tcEl = document.getElementById('trueCount');
+      tcEl.textContent = trueCount.toFixed(1);
+      tcEl.className = 'stat-value';
+      if (trueCount > 1) tcEl.classList.add('positive');
+      else if (trueCount < -1) tcEl.classList.add('negative');
+      else tcEl.classList.add('neutral');
+
+      let betUnits = '1x';
+      if (trueCount >= 2) betUnits = '2x';
+      if (trueCount >= 3) betUnits = '4x';
+      if (trueCount >= 4) betUnits = '6x';
+      if (trueCount >= 5) betUnits = '8x';
+      document.getElementById('betUnits').textContent = betUnits;
+
+      document.getElementById('cardsPlayed').textContent = `${cardsPlayed}/${totalCards}`;
+      document.getElementById('decksLeft').textContent = decksRemaining.toFixed(1);
+
+      updateTableState();
+    }
+
+    function updateTableState() {
+      const container = document.getElementById('tableState');
+      
+      if (!table.roundActive && table.dealer.length === 0) {
+        container.innerHTML = '<div class="inactive-notice">Presiona "Nueva Mano" para comenzar</div>';
+        return;
+      }
+
+      let html = '';
+      html += renderHand('Dealer', table.dealer);
+
+      const labels = { me: '🎮 Yo', p1: '👤 P1', p2: '👤 P2', p3: '👤 P3' };
+      Object.keys(table.players).forEach(k => {
+        if (table.players[k].length > 0) {
+          html += renderHand(labels[k], table.players[k]);
+        }
+      });
+
+      container.innerHTML = html;
+    }
+
+    function renderHand(name, hand) {
+      if (!hand || hand.length === 0) return '';
+
+      const total = handValue(hand);
+      const isBust = total > 21;
+      const isBJ = isBlackjack(hand);
+
+      let totalClass = 'hand-total';
+      let totalText = total;
+
+      if (isBust) {
+        totalClass += ' bust';
+        totalText = 'BUST';
+      } else if (isBJ) {
+        totalClass += ' blackjack';
+        totalText = 'BJ!';
+      }
+
+      let html = `
+        <div class="hand">
+          <div class="hand-header">
+            <span class="hand-name">${name}</span>
+            <span class="${totalClass}">${totalText}</span>
+          </div>
+          <div class="hand-cards">
+      `;
+
+      hand.forEach(card => {
+        html += `<span class="mini-card">${card}</span>`;
+      });
+
+      html += '</div></div>';
+      return html;
+    }
+
+    function renderCards() {
+      const grid = document.getElementById('cardsGrid');
+      grid.innerHTML = '';
+
+      allCards.forEach(card => {
+        const btn = document.createElement('button');
+        btn.className = 'card-btn';
+        btn.textContent = card;
+        btn.disabled = !table.roundActive;
+        btn.onclick = () => addCard(card);
+
+        const value = hiLoValues[card];
+        if (value > 0) btn.classList.add('low');
+        else if (value < 0) btn.classList.add('high');
+        else btn.classList.add('mid');
+
+        grid.appendChild(btn);
+      });
+    }
+
+    renderCards();
+    updateDisplay();
+
+    // Prevenir zoom doble tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) e.preventDefault();
+      lastTouchEnd = now;
+    }, false);
+
+    // Wake Lock
+    if ('wakeLock' in navigator) {
+      navigator.wakeLock.request('screen').catch(() => {});
+    }
+  </script>
+</body>
+</html>
