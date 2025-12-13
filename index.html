@@ -3,19 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  
-  <!-- PWA iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="BJ Counter">
   <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230f2027' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dy='0.35em' fill='%234ade80'>♠</text></svg>">
-  
-  <!-- PWA Android -->
   <meta name="theme-color" content="#0f2027">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" id="manifest-placeholder">
-  
-  <title>Blackjack Counter AI Pro</title>
+  <title>Blackjack Counter Pro</title>
   <style>
     * {
       margin: 0;
@@ -27,207 +22,164 @@
       user-select: none;
     }
 
-    html {
+    html, body {
       height: 100%;
       overflow: hidden;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: #fff;
-      height: 100%;
-      padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
     }
 
     .container {
-      max-width: 480px;
-      margin: 0 auto;
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       padding: 16px;
-      padding-bottom: max(80px, env(safe-area-inset-bottom));
+      padding-bottom: 20px;
     }
 
     .header {
       text-align: center;
-      margin-bottom: 20px;
-      padding-top: 16px;
+      margin-bottom: 16px;
+      padding-top: max(16px, env(safe-area-inset-top));
     }
 
     .header h1 {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 800;
       margin-bottom: 4px;
-      letter-spacing: -0.5px;
       background: linear-gradient(135deg, #4ade80, #60a5fa);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
 
-    .header p {
-      font-size: 12px;
-      opacity: 0.6;
-      font-weight: 600;
-    }
-
-    .main-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .stat-card {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    .mode-indicator {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #000;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 800;
       text-align: center;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
+      animation: pulse 2s infinite;
     }
 
-    .stat-label {
-      font-size: 9px;
-      opacity: 0.7;
-      margin-bottom: 4px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
     }
 
-    .stat-value {
-      font-size: 28px;
-      font-weight: 900;
-      line-height: 1;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .stat-value.small {
-      font-size: 20px;
-    }
-
-    .stat-value.positive { 
-      color: #4ade80;
-      text-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
-    }
-    .stat-value.negative { 
-      color: #ef4444;
-      text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
-    }
-    .stat-value.neutral { 
-      color: #60a5fa;
-    }
-
-    .target-tabs {
+    .stats-compact {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
       margin-bottom: 12px;
     }
 
-    .target-tab {
-      padding: 10px 6px;
-      font-size: 11px;
-      font-weight: 700;
-      border: 2px solid rgba(255, 255, 255, 0.2);
+    .stat-mini {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
       border-radius: 12px;
-      background: rgba(0, 0, 0, 0.3);
-      color: rgba(255, 255, 255, 0.6);
-      cursor: pointer;
-      transition: all 0.2s;
+      padding: 8px;
       text-align: center;
-      line-height: 1.2;
-      touch-action: manipulation;
+      border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
-    .target-tab.active {
-      background: linear-gradient(135deg, #4ade80, #22c55e);
-      color: #000;
-      border-color: transparent;
-      transform: scale(1.05);
+    .stat-mini-label {
+      font-size: 8px;
+      opacity: 0.7;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 2px;
     }
 
-    .target-tab:active {
-      transform: scale(0.95);
+    .stat-mini-value {
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1;
     }
 
-    .round-controls {
+    .stat-mini-value.positive { color: #4ade80; }
+    .stat-mini-value.negative { color: #ef4444; }
+    .stat-mini-value.neutral { color: #60a5fa; }
+
+    .quick-controls {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin-bottom: 12px;
     }
 
-    .round-btn {
-      padding: 12px;
-      font-size: 13px;
+    .quick-btn {
+      padding: 14px;
+      font-size: 14px;
       font-weight: 800;
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      transition: all 0.15s;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       touch-action: manipulation;
+      transition: transform 0.1s;
     }
 
-    .round-btn.start {
+    .quick-btn:active {
+      transform: scale(0.95);
+    }
+
+    .quick-btn.primary {
       background: linear-gradient(135deg, #4ade80, #22c55e);
       color: #000;
     }
 
-    .round-btn.end {
+    .quick-btn.secondary {
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: #fff;
+    }
+
+    .quick-btn.danger {
       background: linear-gradient(135deg, #ef4444, #dc2626);
       color: #fff;
     }
 
-    .round-btn:active:not(:disabled) {
-      transform: scale(0.95);
-    }
-
-    .round-btn:disabled {
+    .quick-btn:disabled {
       opacity: 0.3;
       cursor: not-allowed;
+    }
+
+    .cards-section {
+      margin-bottom: 12px;
     }
 
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
-      margin-bottom: 12px;
+      gap: 8px;
     }
 
     .card-btn {
       aspect-ratio: 1;
-      font-size: 18px;
+      font-size: 22px;
       font-weight: 900;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       cursor: pointer;
-      transition: transform 0.1s;
       color: #fff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      border: 2px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border: 3px solid rgba(255, 255, 255, 0.2);
       touch-action: manipulation;
-    }
-
-    .card-btn.low { 
-      background: linear-gradient(135deg, #4ade80, #22c55e);
-    }
-    .card-btn.mid { 
-      background: linear-gradient(135deg, #60a5fa, #3b82f6);
-    }
-    .card-btn.high { 
-      background: linear-gradient(135deg, #ef4444, #dc2626);
+      transition: transform 0.1s;
     }
 
     .card-btn:active:not(:disabled) {
-      transform: scale(0.9);
+      transform: scale(0.88);
     }
 
     .card-btn:disabled {
@@ -235,38 +187,31 @@
       cursor: not-allowed;
     }
 
-    .ai-recommendation {
-      background: linear-gradient(135deg, rgba(74, 222, 128, 0.15), rgba(34, 197, 94, 0.1));
-      border: 2px solid rgba(74, 222, 128, 0.3);
+    .card-btn.low { background: linear-gradient(135deg, #4ade80, #22c55e); }
+    .card-btn.mid { background: linear-gradient(135deg, #60a5fa, #3b82f6); }
+    .card-btn.high { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+    .ai-box {
+      background: linear-gradient(135deg, rgba(74, 222, 128, 0.2), rgba(34, 197, 94, 0.15));
+      border: 2px solid rgba(74, 222, 128, 0.4);
       border-radius: 16px;
-      padding: 16px;
+      padding: 14px;
       margin-bottom: 12px;
       position: relative;
     }
 
-    .ai-recommendation::before {
-      content: '🤖 AI';
+    .ai-box::before {
+      content: '🤖';
       position: absolute;
-      top: 8px;
-      right: 12px;
-      font-size: 11px;
-      font-weight: 800;
-      opacity: 0.5;
-    }
-
-    .ai-title {
-      font-size: 12px;
-      opacity: 0.8;
-      margin-bottom: 8px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      top: 10px;
+      right: 14px;
+      font-size: 18px;
     }
 
     .ai-action {
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 900;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       text-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
     }
 
@@ -275,70 +220,71 @@
     .ai-action.double { color: #fbbf24; }
     .ai-action.split { color: #a78bfa; }
 
-    .ai-details {
-      font-size: 11px;
-      opacity: 0.7;
+    .ai-reason {
+      font-size: 12px;
+      opacity: 0.8;
       line-height: 1.4;
     }
 
-    .table-state {
+    .hands-compact {
       background: rgba(0, 0, 0, 0.3);
-      border-radius: 16px;
-      padding: 14px;
+      border-radius: 14px;
+      padding: 12px;
       margin-bottom: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .hand {
+    .hand-row {
       background: rgba(255, 255, 255, 0.05);
       border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .hand:last-child {
-      margin-bottom: 0;
-    }
-
-    .hand-header {
+      padding: 8px 10px;
+      margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .hand-name {
+    .hand-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .hand-info {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .hand-label {
       font-size: 11px;
       font-weight: 700;
       opacity: 0.7;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      min-width: 50px;
+    }
+
+    .hand-cards-inline {
+      display: flex;
+      gap: 4px;
+    }
+
+    .mini-card {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 3px 7px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
     }
 
     .hand-total {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 900;
+      min-width: 50px;
+      text-align: right;
     }
 
     .hand-total.bust { color: #ef4444; }
     .hand-total.blackjack { color: #fbbf24; }
 
-    .hand-cards {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-
-    .mini-card {
-      background: rgba(255, 255, 255, 0.15);
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .inactive-notice {
+    .inactive-msg {
       text-align: center;
       opacity: 0.5;
       font-size: 13px;
@@ -346,37 +292,40 @@
       font-style: italic;
     }
 
-    .quick-info {
+    .info-footer {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 8px;
       margin-bottom: 12px;
     }
 
-    .info-card {
+    .info-item {
       background: rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      padding: 10px;
+      border-radius: 10px;
+      padding: 8px;
       text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .info-label {
-      font-size: 10px;
+    .info-item-label {
+      font-size: 9px;
       opacity: 0.6;
-      margin-bottom: 4px;
       font-weight: 600;
       text-transform: uppercase;
+      margin-bottom: 3px;
     }
 
-    .info-value {
-      font-size: 16px;
+    .info-item-value {
+      font-size: 14px;
       font-weight: 800;
     }
 
+    .reset-area {
+      text-align: center;
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+
     .reset-btn {
-      width: 100%;
-      padding: 12px;
+      padding: 12px 24px;
       font-size: 12px;
       font-weight: 700;
       border: 2px solid rgba(255, 255, 255, 0.2);
@@ -384,15 +333,12 @@
       background: transparent;
       color: #fff;
       cursor: pointer;
-      transition: all 0.2s;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
       touch-action: manipulation;
     }
 
     .reset-btn:active {
       background: rgba(255, 255, 255, 0.1);
-      transform: scale(0.97);
     }
 
     .install-banner {
@@ -401,169 +347,149 @@
       left: 0;
       right: 0;
       background: linear-gradient(135deg, #4ade80, #22c55e);
-      padding: 14px 20px;
-      padding-bottom: max(14px, calc(env(safe-area-inset-bottom) + 14px));
+      padding: 12px 16px;
+      padding-bottom: max(12px, calc(env(safe-area-inset-bottom) + 12px));
       display: none;
       align-items: center;
       justify-content: space-between;
       box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.4);
       z-index: 1000;
-      animation: slideUp 0.3s ease;
     }
 
     .install-banner.show {
       display: flex;
     }
 
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-
     .install-text {
       color: #000;
       font-weight: 800;
-      font-size: 13px;
+      font-size: 12px;
       flex: 1;
     }
 
     .install-btn {
       background: rgba(0, 0, 0, 0.2);
       border: none;
-      padding: 8px 16px;
+      padding: 8px 14px;
       border-radius: 8px;
       color: #000;
       font-weight: 800;
-      font-size: 12px;
+      font-size: 11px;
       cursor: pointer;
-      margin-left: 10px;
-      touch-action: manipulation;
+      margin-left: 8px;
     }
 
     .install-close {
       background: none;
       border: none;
       color: #000;
-      font-size: 22px;
+      font-size: 20px;
       cursor: pointer;
-      padding: 0 0 0 10px;
-      opacity: 0.7;
-      touch-action: manipulation;
+      padding: 0 0 0 8px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>🤖 Blackjack AI Counter</h1>
-      <p>Estrategia Profesional • Hi-Lo System</p>
+      <h1>♠️ BJ Counter Pro</h1>
     </div>
 
-    <div class="main-stats">
-      <div class="stat-card">
-        <div class="stat-label">RC</div>
-        <div class="stat-value neutral" id="runningCount">0</div>
+    <div class="mode-indicator" id="modeIndicator">
+      🎯 Presiona "COMENZAR" para iniciar
+    </div>
+
+    <div class="stats-compact">
+      <div class="stat-mini">
+        <div class="stat-mini-label">RC</div>
+        <div class="stat-mini-value neutral" id="rc">0</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">TC</div>
-        <div class="stat-value neutral" id="trueCount">0.0</div>
+      <div class="stat-mini">
+        <div class="stat-mini-label">TC</div>
+        <div class="stat-mini-value neutral" id="tc">0.0</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Apuesta</div>
-        <div class="stat-value small neutral" id="betUnits">1x</div>
+      <div class="stat-mini">
+        <div class="stat-mini-label">Apuesta</div>
+        <div class="stat-mini-value neutral" id="bet">1x</div>
+      </div>
+      <div class="stat-mini">
+        <div class="stat-mini-label">Manos</div>
+        <div class="stat-mini-value neutral" id="hands">0</div>
       </div>
     </div>
 
-    <div class="round-controls">
-      <button class="round-btn start" id="startRoundBtn" onclick="startRound()">
-        ▶️ Nueva Mano
+    <div class="quick-controls">
+      <button class="quick-btn primary" id="startBtn" onclick="comenzarMano()">
+        ▶️ Comenzar
       </button>
-      <button class="round-btn end" id="endRoundBtn" onclick="endRound()" disabled>
+      <button class="quick-btn secondary" id="nextBtn" onclick="siguienteJugador()" disabled>
+        ➡️ Siguiente
+      </button>
+      <button class="quick-btn danger" id="endBtn" onclick="terminarMano()" disabled>
         ⏹️ Terminar
       </button>
+      <button class="quick-btn secondary" onclick="toggleAutoMode()">
+        <span id="autoIcon">🤖</span> <span id="autoText">Auto</span>
+      </button>
     </div>
 
-    <div class="target-tabs">
-      <div class="target-tab active" data-target="me" onclick="selectTarget('me')">
-        🎮<br>Yo
-      </div>
-      <div class="target-tab" data-target="dealer" onclick="selectTarget('dealer')">
-        🃏<br>Dealer
-      </div>
-      <div class="target-tab" data-target="p1" onclick="selectTarget('p1')">
-        👤<br>P1
-      </div>
-      <div class="target-tab" data-target="p2" onclick="selectTarget('p2')">
-        👤<br>P2
-      </div>
-      <div class="target-tab" data-target="p3" onclick="selectTarget('p3')">
-        👤<br>P3
-      </div>
+    <div class="cards-section">
+      <div id="cardsGrid" class="cards-grid"></div>
     </div>
 
-    <div id="cardsGrid" class="cards-grid"></div>
-
-    <div class="ai-recommendation" id="aiRecommendation" style="display: none;">
-      <div class="ai-title">Jugada Óptima</div>
-      <div class="ai-action" id="aiAction">-</div>
-      <div class="ai-details" id="aiDetails">Esperando datos...</div>
+    <div class="ai-box" id="aiBox" style="display: none;">
+      <div class="ai-action" id="aiAction">STAND</div>
+      <div class="ai-reason" id="aiReason">Esperando cartas...</div>
     </div>
 
-    <div class="table-state" id="tableState">
-      <div class="inactive-notice">
-        Presiona "Nueva Mano" para comenzar
+    <div class="hands-compact" id="handsArea">
+      <div class="inactive-msg">Presiona "COMENZAR" para iniciar una mano</div>
+    </div>
+
+    <div class="info-footer">
+      <div class="info-item">
+        <div class="info-item-label">Cartas</div>
+        <div class="info-item-value" id="cardsInfo">0/312</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-label">Mazos</div>
+        <div class="info-item-value" id="decksInfo">6.0</div>
       </div>
     </div>
 
-    <div class="quick-info">
-      <div class="info-card">
-        <div class="info-label">Cartas</div>
-        <div class="info-value" id="cardsPlayed">0/312</div>
-      </div>
-      <div class="info-card">
-        <div class="info-label">Mazos</div>
-        <div class="info-value" id="decksLeft">6.0</div>
-      </div>
+    <div class="reset-area">
+      <button class="reset-btn" onclick="resetTotal()">↻ Reset Total</button>
     </div>
-
-    <button class="reset-btn" onclick="resetAll()">
-      ↻ Reset Total (Nueva Zapata)
-    </button>
   </div>
 
   <div class="install-banner" id="installBanner">
-    <span class="install-text">📱 Instalar en tu iPhone</span>
+    <span class="install-text">📱 Instalar app</span>
     <button class="install-btn" onclick="showInstallHelp()">Cómo</button>
     <button class="install-close" onclick="closeInstallBanner()">×</button>
   </div>
 
   <script>
-    // Manifest dinámico
     const manifestData = {
-      name: "Blackjack Counter AI Pro",
+      name: "Blackjack Counter Pro",
       short_name: "BJ Counter",
-      start_url: window.location.pathname,
+      start_url: ".",
       display: "standalone",
       background_color: "#0f2027",
       theme_color: "#0f2027",
       orientation: "portrait",
-      icons: [
-        {
-          src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%230f2027' width='512' height='512'/><text x='256' y='340' font-size='280' text-anchor='middle' fill='%234ade80'>♠</text></svg>",
-          sizes: "512x512",
-          type: "image/svg+xml",
-          purpose: "any maskable"
-        }
-      ]
+      icons: [{
+        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%230f2027' width='512' height='512'/><text x='256' y='340' font-size='280' text-anchor='middle' fill='%234ade80'>♠</text></svg>",
+        sizes: "512x512",
+        type: "image/svg+xml"
+      }]
     };
 
-    const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-    const manifestURL = URL.createObjectURL(manifestBlob);
-    document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+    const blob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    document.getElementById('manifest-placeholder').setAttribute('href', url);
 
-    // PWA Install
+    // PWA
     let deferredPrompt;
-
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
@@ -578,8 +504,7 @@
           closeInstallBanner();
         });
       } else {
-        // iOS - Mostrar instrucciones
-        alert('📱 Para instalar en iPhone:\n\n1. Toca el botón Compartir ⎙\n2. Desplázate y toca "Añadir a pantalla de inicio"\n3. Toca "Añadir"\n\n¡Listo! La app estará en tu pantalla de inicio.');
+        alert('📱 iPhone:\n1. Toca Compartir ⎙\n2. "Añadir a pantalla de inicio"\n\n🤖 Android:\n1. Menú ⋮\n2. "Instalar app"');
       }
     }
 
@@ -587,26 +512,21 @@
       document.getElementById('installBanner').classList.remove('show');
     }
 
-    // Detectar iOS y mostrar banner
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     if (isIOS && !isStandalone) {
-      setTimeout(() => {
-        document.getElementById('installBanner').classList.add('show');
-      }, 2000);
+      setTimeout(() => document.getElementById('installBanner').classList.add('show'), 2000);
     }
 
     // MODELO
-    const table = {
-      dealer: [],
-      players: { me: [], p1: [], p2: [], p3: [] },
-      roundActive: false
-    };
-
+    const players = ['dealer', 'me', 'p1', 'p2', 'p3'];
+    const hands = { dealer: [], me: [], p1: [], p2: [], p3: [] };
+    let currentPlayerIndex = 0;
+    let roundActive = false;
+    let autoMode = false;
     let runningCount = 0;
     let cardsPlayed = 0;
-    let currentTarget = 'me';
+    let handsPlayed = 0;
     const totalCards = 312;
 
     const hiLoValues = {
@@ -616,35 +536,116 @@
     };
 
     const cardValues = {
-      '2': 2, '3': 3, '4': 4, '5': 5, '6': 6,
-      '7': 7, '8': 8, '9': 9, '10': 10,
-      'J': 10, 'Q': 10, 'K': 10, 'A': 11
+      '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
+      '10': 10, 'J': 10, 'Q': 10, 'K': 10, 'A': 11
     };
 
     const allCards = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-    function selectTarget(target) {
-      currentTarget = target;
-      document.querySelectorAll('.target-tab').forEach(tab => tab.classList.remove('active'));
-      document.querySelector(`[data-target="${target}"]`).classList.add('active');
+    function toggleAutoMode() {
+      autoMode = !autoMode;
+      document.getElementById('autoIcon').textContent = autoMode ? '⚡' : '🤖';
+      document.getElementById('autoText').textContent = autoMode ? 'ON' : 'Auto';
+      if (roundActive) updateModeIndicator();
+    }
+
+    function comenzarMano() {
+      Object.keys(hands).forEach(k => hands[k] = []);
+      currentPlayerIndex = 0;
+      roundActive = true;
+      handsPlayed++;
+      
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('endBtn').disabled = false;
+      document.getElementById('nextBtn').disabled = false;
+      document.querySelectorAll('.card-btn').forEach(b => b.disabled = false);
+      document.getElementById('aiBox').style.display = 'none';
+      
+      updateModeIndicator();
+      updateDisplay();
+    }
+
+    function siguienteJugador() {
+      if (!roundActive) return;
+      currentPlayerIndex++;
+      if (currentPlayerIndex >= players.length) currentPlayerIndex = 0;
+      updateModeIndicator();
+      updateDisplay();
+    }
+
+    function terminarMano() {
+      roundActive = false;
+      currentPlayerIndex = 0;
+      
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('endBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = true;
+      document.querySelectorAll('.card-btn').forEach(b => b.disabled = true);
+      document.getElementById('aiBox').style.display = 'none';
+      
+      updateModeIndicator();
+      updateDisplay();
+    }
+
+    function resetTotal() {
+      if (!confirm('¿Reset total? Borra TODO el conteo.')) return;
+      runningCount = 0;
+      cardsPlayed = 0;
+      handsPlayed = 0;
+      Object.keys(hands).forEach(k => hands[k] = []);
+      roundActive = false;
+      currentPlayerIndex = 0;
+      
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('endBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = true;
+      document.querySelectorAll('.card-btn').forEach(b => b.disabled = true);
+      document.getElementById('aiBox').style.display = 'none';
+      
+      updateModeIndicator();
+      updateDisplay();
     }
 
     function addCard(card) {
-      if (!table.roundActive) return;
+      if (!roundActive) return;
 
       runningCount += hiLoValues[card];
       cardsPlayed++;
 
-      if (currentTarget === 'dealer') {
-        table.dealer.push(card);
-      } else {
-        table.players[currentTarget].push(card);
-      }
+      const currentPlayer = players[currentPlayerIndex];
+      hands[currentPlayer].push(card);
 
       if (navigator.vibrate) navigator.vibrate(5);
 
       updateDisplay();
-      getAIRecommendation();
+
+      // Auto-avance
+      if (autoMode) {
+        setTimeout(() => siguienteJugador(), 300);
+      }
+    }
+
+    function updateModeIndicator() {
+      const indicator = document.getElementById('modeIndicator');
+      if (!roundActive) {
+        indicator.textContent = '🎯 Presiona "COMENZAR" para iniciar';
+        indicator.style.background = 'linear-gradient(135deg, #60a5fa, #3b82f6)';
+        return;
+      }
+
+      const player = players[currentPlayerIndex];
+      const labels = {
+        dealer: '🃏 DEALER',
+        me: '🎮 TÚ (Toca cartas)',
+        p1: '👤 JUGADOR 1',
+        p2: '👤 JUGADOR 2',
+        p3: '👤 JUGADOR 3'
+      };
+
+      indicator.textContent = `${labels[player]}${autoMode ? ' (AUTO)' : ''}`;
+      indicator.style.background = player === 'me' ? 
+        'linear-gradient(135deg, #4ade80, #22c55e)' :
+        'linear-gradient(135deg, #fbbf24, #f59e0b)';
     }
 
     function handValue(hand) {
@@ -663,50 +664,93 @@
     }
 
     function canSplit(hand) {
-      if (hand.length !== 2) return false;
-      return cardValues[hand[0]] === cardValues[hand[1]];
+      return hand.length === 2 && cardValues[hand[0]] === cardValues[hand[1]];
     }
 
-    function startRound() {
-      table.dealer = [];
-      Object.keys(table.players).forEach(p => table.players[p] = []);
-      table.roundActive = true;
-      document.getElementById('startRoundBtn').disabled = true;
-      document.getElementById('endRoundBtn').disabled = false;
-      document.querySelectorAll('.card-btn').forEach(b => b.disabled = false);
-      document.getElementById('aiRecommendation').style.display = 'none';
-      updateDisplay();
-    }
+    function updateDisplay() {
+      const rc = document.getElementById('rc');
+      rc.textContent = runningCount > 0 ? '+' + runningCount : runningCount;
+      rc.className = 'stat-mini-value';
+      if (runningCount > 0) rc.classList.add('positive');
+      else if (runningCount < 0) rc.classList.add('negative');
+      else rc.classList.add('neutral');
 
-    function endRound() {
-      table.roundActive = false;
-      document.getElementById('startRoundBtn').disabled = false;
-      document.getElementById('endRoundBtn').disabled = true;
-      document.querySelectorAll('.card-btn').forEach(b => b.disabled = true);
-      document.getElementById('aiRecommendation').style.display = 'none';
-      updateDisplay();
-    }
-
-    function resetAll() {
-      if (!confirm('¿Reset completo? Se borrará el conteo.')) return;
-      runningCount = 0;
-      cardsPlayed = 0;
-      table.dealer = [];
-      Object.keys(table.players).forEach(p => table.players[p] = []);
-      table.roundActive = false;
-      document.getElementById('startRoundBtn').disabled = false;
-      document.getElementById('endRoundBtn').disabled = true;
-      document.querySelectorAll('.card-btn').forEach(b => b.disabled = true);
-      document.getElementById('aiRecommendation').style.display = 'none';
-      updateDisplay();
-    }
-
-    function getAIRecommendation() {
-      const myHand = table.players.me;
-      const dealerHand = table.dealer;
+      const decksRemaining = Math.max(0.5, (totalCards - cardsPlayed) / 52);
+      const trueCount = runningCount / decksRemaining;
       
-      if (myHand.length === 0 || dealerHand.length === 0) {
-        document.getElementById('aiRecommendation').style.display = 'none';
+      const tc = document.getElementById('tc');
+      tc.textContent = trueCount.toFixed(1);
+      tc.className = 'stat-mini-value';
+      if (trueCount > 1) tc.classList.add('positive');
+      else if (trueCount < -1) tc.classList.add('negative');
+      else tc.classList.add('neutral');
+
+      let betUnits = '1x';
+      if (trueCount >= 2) betUnits = '2x';
+      if (trueCount >= 3) betUnits = '4x';
+      if (trueCount >= 4) betUnits = '6x';
+      if (trueCount >= 5) betUnits = '8x';
+      document.getElementById('bet').textContent = betUnits;
+      document.getElementById('hands').textContent = handsPlayed;
+
+      document.getElementById('cardsInfo').textContent = `${cardsPlayed}/${totalCards}`;
+      document.getElementById('decksInfo').textContent = decksRemaining.toFixed(1);
+
+      updateHandsDisplay();
+      updateAI();
+    }
+
+    function updateHandsDisplay() {
+      const area = document.getElementById('handsArea');
+      
+      if (!roundActive && hands.dealer.length === 0) {
+        area.innerHTML = '<div class="inactive-msg">Presiona "COMENZAR" para iniciar una mano</div>';
+        return;
+      }
+
+      const labels = { dealer: '🃏 Dealer', me: '🎮 Tú', p1: '👤 P1', p2: '👤 P2', p3: '👤 P3' };
+      let html = '';
+
+      players.forEach(p => {
+        if (hands[p].length === 0) return;
+
+        const total = handValue(hands[p]);
+        const isBust = total > 21;
+        const isBJ = isBlackjack(hands[p]);
+
+        let totalClass = 'hand-total';
+        let totalText = total;
+
+        if (isBust) {
+          totalClass += ' bust';
+          totalText = 'BUST';
+        } else if (isBJ) {
+          totalClass += ' blackjack';
+          totalText = 'BJ!';
+        }
+
+        html += `
+          <div class="hand-row">
+            <div class="hand-info">
+              <div class="hand-label">${labels[p]}</div>
+              <div class="hand-cards-inline">
+                ${hands[p].map(c => `<span class="mini-card">${c}</span>`).join('')}
+              </div>
+            </div>
+            <div class="${totalClass}">${totalText}</div>
+          </div>
+        `;
+      });
+
+      area.innerHTML = html;
+    }
+
+    function updateAI() {
+      const myHand = hands.me;
+      const dealerHand = hands.dealer;
+      
+      if (myHand.length === 0 || dealerHand.length === 0 || !roundActive) {
+        document.getElementById('aiBox').style.display = 'none';
         return;
       }
 
@@ -714,151 +758,131 @@
       const dealerUpcard = dealerHand[0];
       const dealerValue = cardValues[dealerUpcard];
       
-      const strategy = getBasicStrategy(myTotal, dealerValue, myHand);
+      const decksRemaining = Math.max(0.5, (totalCards - cardsPlayed) / 52);
+      const trueCount = Math.round(runningCount / decksRemaining);
       
-      const recDiv = document.getElementById('aiRecommendation');
-      recDiv.style.display = 'block';
-      recDiv.innerHTML = `
-        <div class="ai-title">🤖 Estrategia Básica</div>
-        <div class="ai-action ${strategy.class}">${strategy.emoji} ${strategy.action}</div>
-        <div class="ai-details">${strategy.reason}</div>
-      `;
+      const strategy = getStrategy(myTotal, dealerValue, myHand, trueCount);
+      
+      document.getElementById('aiBox').style.display = 'block';
+      document.getElementById('aiAction').className = 'ai-action ' + strategy.class;
+      document.getElementById('aiAction').textContent = strategy.emoji + ' ' + strategy.action;
+      document.getElementById('aiReason').textContent = strategy.reason;
     }
 
-    function getBasicStrategy(myTotal, dealerValue, myHand) {
+    function getStrategy(myTotal, dealerValue, myHand, tc) {
+      // Blackjack
       if (isBlackjack(myHand)) {
         return { action: 'STAND', class: 'stand', emoji: '🎉', reason: '¡Blackjack! Ya ganaste.' };
       }
 
+      // Ya pasado
+      if (myTotal > 21) {
+        return { action: 'BUST', class: 'stand', emoji: '💥', reason: 'Te pasaste de 21.' };
+      }
+
+      // Pares
       if (canSplit(myHand)) {
         const card = myHand[0];
         if (card === 'A' || card === '8') {
           return { action: 'SPLIT', class: 'split', emoji: '✂️', reason: 'Siempre divide Ases y 8s.' };
         }
-        if (card === '9' && dealerValue <= 6) {
-          return { action: 'SPLIT', class: 'split', emoji: '✂️', reason: 'Divide 9s vs dealer débil.' };
+        if (card === '9' && dealerValue >= 2 && dealerValue <= 6) {
+          return { action: 'SPLIT', class: 'split', emoji: '✂️', reason: 'Divide 9s vs dealer débil (2-6).' };
         }
       }
 
-      const hasAce = myHand.includes('A') && myTotal <= 21;
-      if (hasAce && myTotal < 19) {
-        if (myTotal >= 18 && dealerValue >= 9) {
-          return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Soft 18 vs alta: pide.' };
+      // Manos suaves (con As)
+      const hasAce = myHand.includes('A');
+      const softTotal = hasAce && myTotal <= 21;
+
+      if (softTotal) {
+        // Soft 19-21: siempre plántate
+        if (myTotal >= 19) {
+          return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Soft 19+ es muy buena mano.' };
         }
+        
+        // Soft 18 (A,7)
+        if (myTotal === 18) {
+          if (dealerValue >= 9) {
+            return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Soft 18 vs 9/10/A: pide para mejorar.' };
+          }
+          if (dealerValue >= 2 && dealerValue <= 6 && myHand.length === 2) {
+            return { action: 'DOUBLE', class: 'double', emoji: '💰', reason: 'Soft 18 vs débil: dobla.' };
+          }
+          return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Soft 18 es aceptable.' };
+        }
+        
+        // Soft 17 o menos: siempre pide
         if (myTotal <= 17) {
-          return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Soft baja: pide.' };
+          return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Soft 17- siempre mejora.' };
         }
       }
 
-      if (myTotal >= 17) {
-        return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Total alto: plántate.' };
-      }
-
-      if (myTotal >= 12 && myTotal <= 16) {
-        if (dealerValue >= 2 && dealerValue <= 6) {
-          return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Dealer puede pasarse.' };
-        } else {
-          return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Dealer fuerte: mejora.' };
-        }
-      }
-
-      if (myTotal <= 11) {
-        if (myTotal === 11 && myHand.length === 2) {
-          return { action: 'DOUBLE', class: 'double', emoji: '💰', reason: '11 es ideal para doblar.' };
-        }
-        if (myTotal === 10 && myHand.length === 2 && dealerValue <= 9) {
-          return { action: 'DOUBLE', class: 'double', emoji: '💰', reason: '10 vs débil: dobla.' };
-        }
-        return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Total bajo: pide.' };
-      }
-
-      return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Jugada estándar.' };
-    }
-
-    function updateDisplay() {
-      const rcEl = document.getElementById('runningCount');
-      rcEl.textContent = runningCount > 0 ? '+' + runningCount : runningCount;
-      rcEl.className = 'stat-value';
-      if (runningCount > 0) rcEl.classList.add('positive');
-      else if (runningCount < 0) rcEl.classList.add('negative');
-      else rcEl.classList.add('neutral');
-
-      const decksRemaining = Math.max(0.5, (totalCards - cardsPlayed) / 52);
-      const trueCount = runningCount / decksRemaining;
-      const tcEl = document.getElementById('trueCount');
-      tcEl.textContent = trueCount.toFixed(1);
-      tcEl.className = 'stat-value';
-      if (trueCount > 1) tcEl.classList.add('positive');
-      else if (trueCount < -1) tcEl.classList.add('negative');
-      else tcEl.classList.add('neutral');
-
-      let betUnits = '1x';
-      if (trueCount >= 2) betUnits = '2x';
-      if (trueCount >= 3) betUnits = '4x';
-      if (trueCount >= 4) betUnits = '6x';
-      if (trueCount >= 5) betUnits = '8x';
-      document.getElementById('betUnits').textContent = betUnits;
-
-      document.getElementById('cardsPlayed').textContent = `${cardsPlayed}/${totalCards}`;
-      document.getElementById('decksLeft').textContent = decksRemaining.toFixed(1);
-
-      updateTableState();
-    }
-
-    function updateTableState() {
-      const container = document.getElementById('tableState');
+      // Manos duras
       
-      if (!table.roundActive && table.dealer.length === 0) {
-        container.innerHTML = '<div class="inactive-notice">Presiona "Nueva Mano" para comenzar</div>';
-        return;
+      // 17 o más: plántate
+      if (myTotal >= 17) {
+        return { action: 'STAND', class: 'stand', emoji: '✋', reason: '17+ es riesgoso pedir.' };
       }
 
-      let html = '';
-      html += renderHand('Dealer', table.dealer);
-
-      const labels = { me: '🎮 Yo', p1: '👤 P1', p2: '👤 P2', p3: '👤 P3' };
-      Object.keys(table.players).forEach(k => {
-        if (table.players[k].length > 0) {
-          html += renderHand(labels[k], table.players[k]);
+      // 13-16 vs dealer
+      if (myTotal >= 13 && myTotal <= 16) {
+        // Ajuste por TC para 16 vs 10
+        if (myTotal === 16 && dealerValue === 10 && tc >= 0) {
+          return { action: 'STAND', class: 'stand', emoji: '✋', reason: '16 vs 10 con TC≥0: plántate (desviación).' };
         }
-      });
-
-      container.innerHTML = html;
-    }
-
-    function renderHand(name, hand) {
-      if (!hand || hand.length === 0) return '';
-
-      const total = handValue(hand);
-      const isBust = total > 21;
-      const isBJ = isBlackjack(hand);
-
-      let totalClass = 'hand-total';
-      let totalText = total;
-
-      if (isBust) {
-        totalClass += ' bust';
-        totalText = 'BUST';
-      } else if (isBJ) {
-        totalClass += ' blackjack';
-        totalText = 'BJ!';
+        
+        // Ajuste por TC para 15 vs 10
+        if (myTotal === 15 && dealerValue === 10 && tc >= 4) {
+          return { action: 'STAND', class: 'stand', emoji: '✋', reason: '15 vs 10 con TC≥4: plántate (desviación).' };
+        }
+        
+        if (dealerValue >= 2 && dealerValue <= 6) {
+          return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Dealer débil (2-6) puede pasarse.' };
+        } else {
+          return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Dealer fuerte (7-A): debes mejorar.' };
+        }
       }
 
-      let html = `
-        <div class="hand">
-          <div class="hand-header">
-            <span class="hand-name">${name}</span>
-            <span class="${totalClass}">${totalText}</span>
-          </div>
-          <div class="hand-cards">
-      `;
+      // 12 vs dealer
+      if (myTotal === 12) {
+        if (dealerValue >= 4 && dealerValue <= 6) {
+          return { action: 'STAND', class: 'stand', emoji: '✋', reason: '12 vs 4-6: dealer débil.' };
+        } else {
+          return { action: 'HIT', class: 'hit', emoji: '👆', reason: '12 vs 2-3 o 7+: pide.' };
+        }
+      }
 
-      hand.forEach(card => {
-        html += `<span class="mini-card">${card}</span>`;
-      });
+      // 11: dobla o pide
+      if (myTotal === 11) {
+        if (myHand.length === 2) {
+          return { action: 'DOUBLE', class: 'double', emoji: '💰', reason: '11 es LA MEJOR mano para doblar.' };
+        }
+        return { action: 'HIT', class: 'hit', emoji: '👆', reason: '11: pide para llegar a 21.' };
+      }
 
-      html += '</div></div>';
-      return html;
+      // 10: dobla vs débil
+      if (myTotal === 10) {
+        if (myHand.length === 2 && dealerValue >= 2 && dealerValue <= 9) {
+          return { action: 'DOUBLE', class: 'double', emoji: '💰', reason: '10 vs 2-9: dobla.' };
+        }
+        return { action: 'HIT', class: 'hit', emoji: '👆', reason: '10: pide.' };
+      }
+
+      // 9: dobla vs muy débil
+      if (myTotal === 9) {
+        if (myHand.length === 2 && dealerValue >= 3 && dealerValue <= 6) {
+          return { action: 'DOUBLE', class: 'double', emoji: '💰', reason: '9 vs 3-6: dobla.' };
+        }
+        return { action: 'HIT', class: 'hit', emoji: '👆', reason: '9: pide.' };
+      }
+
+      // 5-8: siempre pide
+      if (myTotal <= 8) {
+        return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Total bajo: imposible pasarse.' };
+      }
+
+      return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Jugada conservadora.' };
     }
 
     function renderCards() {
@@ -869,7 +893,7 @@
         const btn = document.createElement('button');
         btn.className = 'card-btn';
         btn.textContent = card;
-        btn.disabled = !table.roundActive;
+        btn.disabled = !roundActive;
         btn.onclick = () => addCard(card);
 
         const value = hiLoValues[card];
@@ -882,9 +906,10 @@
     }
 
     renderCards();
+    updateModeIndicator();
     updateDisplay();
 
-    // Prevenir zoom doble tap
+    // Prevenir zoom
     let lastTouchEnd = 0;
     document.addEventListener('touchend', (e) => {
       const now = Date.now();
