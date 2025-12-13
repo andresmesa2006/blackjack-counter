@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="BJ Counter">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230f2027' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dy='0.35em' fill='%234ade80'>♠</text></svg>">
-  <meta name="theme-color" content="#0f2027">
-  <link rel="manifest" id="manifest-placeholder">
   <title>Blackjack Counter Pro</title>
   <style>
     * {
@@ -27,7 +23,7 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: #fff;
       display: flex;
@@ -39,22 +35,112 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       padding: 16px;
-      padding-bottom: 20px;
     }
 
     .header {
       text-align: center;
       margin-bottom: 16px;
-      padding-top: max(16px, env(safe-area-inset-top));
     }
 
     .header h1 {
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 800;
-      margin-bottom: 4px;
       background: linear-gradient(135deg, #4ade80, #60a5fa);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 11px;
+      opacity: 0.6;
+      margin-top: 4px;
+    }
+
+    .welcome-screen {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 24px;
+      border: 2px solid rgba(74, 222, 128, 0.3);
+    }
+
+    .welcome-title {
+      font-size: 22px;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    .feature-icon {
+      font-size: 24px;
+      min-width: 32px;
+    }
+
+    .feature-text {
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 800;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: #000;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: #fff;
+    }
+
+    .tutorial-screen {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 24px;
+    }
+
+    .tutorial-step {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+      border-left: 4px solid #4ade80;
+    }
+
+    .step-number {
+      font-size: 20px;
+      font-weight: 900;
+      color: #4ade80;
+      margin-bottom: 6px;
+    }
+
+    .step-text {
+      font-size: 13px;
+      line-height: 1.5;
     }
 
     .mode-indicator {
@@ -62,11 +148,10 @@
       color: #000;
       padding: 12px 16px;
       border-radius: 12px;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 800;
       text-align: center;
       margin-bottom: 12px;
-      box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
     }
 
     .stats-compact {
@@ -82,10 +167,9 @@
       border-radius: 12px;
       padding: 8px;
       text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
-    .stat-mini-label {
+    .stat-label {
       font-size: 8px;
       opacity: 0.7;
       font-weight: 700;
@@ -93,17 +177,15 @@
       margin-bottom: 2px;
     }
 
-    .stat-mini-value {
+    .stat-value {
       font-size: 18px;
       font-weight: 900;
-      line-height: 1;
     }
 
-    .stat-mini-value.positive { color: #4ade80; }
-    .stat-mini-value.negative { color: #ef4444; }
-    .stat-mini-value.neutral { color: #60a5fa; }
+    .stat-value.positive { color: #4ade80; }
+    .stat-value.negative { color: #ef4444; }
+    .stat-value.neutral { color: #60a5fa; }
 
-    /* Setup screen */
     .setup-screen {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
@@ -119,70 +201,104 @@
       text-align: center;
     }
 
-    .players-selector {
+    .position-config {
+      margin-bottom: 20px;
+    }
+
+    .position-label {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      opacity: 0.8;
+    }
+
+    .number-selector {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
-    .player-option {
+    .number-option {
       aspect-ratio: 1;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       background: rgba(0, 0, 0, 0.3);
       border: 2px solid rgba(255, 255, 255, 0.2);
       border-radius: 12px;
       cursor: pointer;
+      font-size: 20px;
+      font-weight: 900;
       transition: all 0.2s;
-      font-size: 24px;
-      padding: 8px;
     }
 
-    .player-option.selected {
+    .number-option.selected {
       background: linear-gradient(135deg, #4ade80, #22c55e);
       border-color: transparent;
       transform: scale(1.05);
     }
 
-    .player-option-label {
-      font-size: 11px;
-      font-weight: 700;
-      margin-top: 4px;
+    .table-visual {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 14px;
+      padding: 16px;
+      margin: 16px 0;
+      text-align: center;
     }
 
-    .player-option:active {
-      transform: scale(0.95);
+    .table-visual-title {
+      font-size: 11px;
+      opacity: 0.6;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .table-positions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .position-chip {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .position-chip.me {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: #000;
+    }
+
+    .position-chip.dealer {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff;
     }
 
     .quick-controls {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       margin-bottom: 12px;
     }
 
     .quick-btn {
-      padding: 14px;
-      font-size: 14px;
+      padding: 12px;
+      font-size: 13px;
       font-weight: 800;
       border: none;
       border-radius: 12px;
       cursor: pointer;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      touch-action: manipulation;
-      transition: transform 0.1s;
     }
 
-    .quick-btn:active:not(:disabled) {
-      transform: scale(0.95);
-    }
-
-    .quick-btn.primary {
-      background: linear-gradient(135deg, #4ade80, #22c55e);
+    .quick-btn.warning {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
       color: #000;
     }
 
@@ -196,19 +312,11 @@
       color: #fff;
     }
 
-    .quick-btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-
-    .cards-section {
-      margin-bottom: 12px;
-    }
-
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 8px;
+      margin-bottom: 12px;
     }
 
     .card-btn {
@@ -219,14 +327,7 @@
       border-radius: 14px;
       cursor: pointer;
       color: #fff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       border: 3px solid rgba(255, 255, 255, 0.2);
-      touch-action: manipulation;
-      transition: transform 0.1s;
-    }
-
-    .card-btn:active:not(:disabled) {
-      transform: scale(0.88);
     }
 
     .card-btn:disabled {
@@ -259,7 +360,6 @@
       font-size: 26px;
       font-weight: 900;
       margin-bottom: 6px;
-      text-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
     }
 
     .ai-action.hit { color: #4ade80; }
@@ -291,8 +391,9 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .hand-row:last-child {
-      margin-bottom: 0;
+    .hand-row.active {
+      border: 2px solid #fbbf24;
+      background: rgba(251, 191, 36, 0.1);
     }
 
     .hand-info {
@@ -308,7 +409,7 @@
       min-width: 50px;
     }
 
-    .hand-cards-inline {
+    .hand-cards {
       display: flex;
       gap: 4px;
     }
@@ -331,14 +432,6 @@
     .hand-total.bust { color: #ef4444; }
     .hand-total.blackjack { color: #fbbf24; }
 
-    .inactive-msg {
-      text-align: center;
-      opacity: 0.5;
-      font-size: 13px;
-      padding: 16px;
-      font-style: italic;
-    }
-
     .info-footer {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -353,7 +446,7 @@
       text-align: center;
     }
 
-    .info-item-label {
+    .info-label {
       font-size: 9px;
       opacity: 0.6;
       font-weight: 600;
@@ -361,14 +454,9 @@
       margin-bottom: 3px;
     }
 
-    .info-item-value {
+    .info-value {
       font-size: 14px;
       font-weight: 800;
-    }
-
-    .reset-area {
-      text-align: center;
-      padding-bottom: max(16px, env(safe-area-inset-bottom));
     }
 
     .reset-btn {
@@ -381,136 +469,170 @@
       color: #fff;
       cursor: pointer;
       text-transform: uppercase;
-      touch-action: manipulation;
+      display: block;
+      margin: 0 auto;
     }
 
-    .reset-btn:active {
-      background: rgba(255, 255, 255, 0.1);
-    }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <h1>♠️ BJ Counter Pro</h1>
+      <div class="subtitle">Sistema Hi-Lo Profesional</div>
     </div>
 
-    <div class="mode-indicator" id="modeIndicator">
-      🎯 ¿Cuántos jugadores hay en la mesa?
+    <div id="welcomeScreen">
+      <div class="welcome-screen">
+        <div class="welcome-title">🎰 CONTADOR DE CARTAS</div>
+        <div style="margin-bottom: 20px;">
+          <div class="feature-item">
+            <div class="feature-icon">📊</div>
+            <div class="feature-text"><strong>Sistema Hi-Lo:</strong> Cuenta cartas en tiempo real</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">💰</div>
+            <div class="feature-text"><strong>Gestión de Apuesta:</strong> Te dice cuánto apostar</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🤖</div>
+            <div class="feature-text"><strong>IA Estratégica:</strong> Recomendaciones óptimas</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🎯</div>
+            <div class="feature-text"><strong>Estrategia Básica + Desviaciones</strong></div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="showTutorial()">📚 Ver Tutorial</button>
+        <button class="btn btn-secondary" onclick="goToSetup()">▶️ Empezar</button>
+      </div>
     </div>
 
-    <div class="stats-compact">
-      <div class="stat-mini">
-        <div class="stat-mini-label">RC</div>
-        <div class="stat-mini-value neutral" id="rc">0</div>
-      </div>
-      <div class="stat-mini">
-        <div class="stat-mini-label">TC</div>
-        <div class="stat-mini-value neutral" id="tc">0.0</div>
-      </div>
-      <div class="stat-mini">
-        <div class="stat-mini-label">Apuesta</div>
-        <div class="stat-mini-value neutral" id="bet">1x</div>
-      </div>
-      <div class="stat-mini">
-        <div class="stat-mini-label">Manos</div>
-        <div class="stat-mini-value neutral" id="hands">0</div>
+    <div id="tutorialScreen" class="hidden">
+      <div class="tutorial-screen">
+        <div class="setup-title">📚 TUTORIAL RÁPIDO</div>
+        <div class="tutorial-step">
+          <div class="step-number">1️⃣ CONFIGURA LA MESA</div>
+          <div class="step-text">Selecciona cuántos jugadores hay ANTES y DESPUÉS de ti.</div>
+        </div>
+        <div class="tutorial-step">
+          <div class="step-number">2️⃣ FASE DE REPARTO</div>
+          <div class="step-text">Toca las cartas de cada jugador según se reparten.</div>
+        </div>
+        <div class="tutorial-step">
+          <div class="step-number">3️⃣ TU TURNO</div>
+          <div class="step-text">La IA te dirá la mejor jugada (HIT, STAND, DOUBLE, SPLIT).</div>
+        </div>
+        <div class="tutorial-step">
+          <div class="step-number">4️⃣ OTROS JUGADORES</div>
+          <div class="step-text">Usa "Siguiente" para avanzar al siguiente jugador.</div>
+        </div>
+        <div class="tutorial-step">
+          <div class="step-number">5️⃣ CUENTA Y APUESTA</div>
+          <div class="step-text">TC positivo = aumenta apuesta. TC negativo = apuesta mínima.</div>
+        </div>
+        <button class="btn btn-primary" onclick="goToSetup()">✅ Entendido</button>
       </div>
     </div>
 
-    <!-- Setup screen -->
-    <div class="setup-screen" id="setupScreen">
-      <div class="setup-title">👥 ¿Cuántos jugadores además de ti?</div>
-      <div class="players-selector">
-        <div class="player-option" onclick="selectPlayers(0)">
-          <div>🎮</div>
-          <div class="player-option-label">Solo yo</div>
-        </div>
-        <div class="player-option" onclick="selectPlayers(1)">
-          <div>🎮👤</div>
-          <div class="player-option-label">Yo +1</div>
-        </div>
-        <div class="player-option" onclick="selectPlayers(2)">
-          <div>🎮👤👤</div>
-          <div class="player-option-label">Yo +2</div>
-        </div>
-        <div class="player-option" onclick="selectPlayers(3)">
-          <div>🎮👤👤👤</div>
-          <div class="player-option-label">Yo +3</div>
-        </div>
+    <div class="mode-indicator hidden" id="modeIndicator">Configurando...</div>
+
+    <div class="stats-compact hidden" id="statsArea">
+      <div class="stat-mini">
+        <div class="stat-label">RC</div>
+        <div class="stat-value neutral" id="rc">0</div>
       </div>
-      <button class="quick-btn primary" style="width: 100%" id="startSetupBtn" onclick="comenzarConSetup()" disabled>
-        ▶️ Comenzar Mano
-      </button>
+      <div class="stat-mini">
+        <div class="stat-label">TC</div>
+        <div class="stat-value neutral" id="tc">0.0</div>
+      </div>
+      <div class="stat-mini">
+        <div class="stat-label">Apuesta</div>
+        <div class="stat-value neutral" id="bet">1x</div>
+      </div>
+      <div class="stat-mini">
+        <div class="stat-label">Manos</div>
+        <div class="stat-value neutral" id="hands">0</div>
+      </div>
     </div>
 
-    <!-- Game controls -->
-    <div id="gameControls" style="display: none;">
+    <div class="setup-screen hidden" id="setupScreen">
+      <div class="setup-title">🎲 CONFIGURAR MESA</div>
+      
+      <div class="position-config">
+        <div class="position-label">👤 Jugadores ANTES de ti:</div>
+        <div class="number-selector" id="beforeSelector">
+          <div class="number-option" onclick="selectBefore(0)">0</div>
+          <div class="number-option" onclick="selectBefore(1)">1</div>
+          <div class="number-option" onclick="selectBefore(2)">2</div>
+          <div class="number-option" onclick="selectBefore(3)">3</div>
+        </div>
+      </div>
+
+      <div class="position-config">
+        <div class="position-label">👤 Jugadores DESPUÉS de ti:</div>
+        <div class="number-selector" id="afterSelector">
+          <div class="number-option" onclick="selectAfter(0)">0</div>
+          <div class="number-option" onclick="selectAfter(1)">1</div>
+          <div class="number-option" onclick="selectAfter(2)">2</div>
+          <div class="number-option" onclick="selectAfter(3)">3</div>
+        </div>
+      </div>
+
+      <div class="table-visual">
+        <div class="table-visual-title">Vista de la Mesa</div>
+        <div class="table-positions" id="tablePositions">
+          <div class="position-chip">Configura jugadores</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="startGameBtn" onclick="startGame()" disabled>▶️ Comenzar Mano</button>
+    </div>
+
+    <div id="gameControls" class="hidden">
       <div class="quick-controls">
-        <button class="quick-btn secondary" id="nextBtn" onclick="siguienteJugador()">
-          ➡️ Siguiente
-        </button>
-        <button class="quick-btn danger" id="endBtn" onclick="terminarMano()">
-          ⏹️ Terminar
-        </button>
+        <button class="quick-btn warning" onclick="undoLastCard()">↩️ Deshacer</button>
+        <button class="quick-btn secondary" onclick="nextPlayer()">➡️ Siguiente</button>
+        <button class="quick-btn danger" onclick="endHand()">⏹️ Terminar</button>
       </div>
     </div>
 
-    <div class="cards-section">
-      <div id="cardsGrid" class="cards-grid"></div>
-    </div>
+    <div class="cards-grid hidden" id="cardsSection"></div>
 
-    <div class="ai-box" id="aiBox" style="display: none;">
+    <div class="ai-box hidden" id="aiBox">
       <div class="ai-action" id="aiAction">STAND</div>
-      <div class="ai-reason" id="aiReason">Esperando cartas...</div>
+      <div class="ai-reason" id="aiReason">Esperando...</div>
     </div>
 
-    <div class="hands-compact" id="handsArea">
-      <div class="inactive-msg">Selecciona cuántos jugadores hay</div>
+    <div class="hands-compact hidden" id="handsArea">
+      <div style="text-align: center; opacity: 0.5; padding: 16px;">Configura la mesa</div>
     </div>
 
-    <div class="info-footer">
+    <div class="info-footer hidden" id="infoFooter">
       <div class="info-item">
-        <div class="info-item-label">Cartas</div>
-        <div class="info-item-value" id="cardsInfo">0/312</div>
+        <div class="info-label">Cartas</div>
+        <div class="info-value" id="cardsInfo">0/312</div>
       </div>
       <div class="info-item">
-        <div class="info-item-label">Mazos</div>
-        <div class="info-item-value" id="decksInfo">6.0</div>
+        <div class="info-label">Mazos</div>
+        <div class="info-value" id="decksInfo">6.0</div>
       </div>
     </div>
 
-    <div class="reset-area">
-      <button class="reset-btn" onclick="resetTotal()">↻ Reset Total</button>
+    <div class="hidden" id="resetArea" style="text-align: center; padding: 16px;">
+      <button class="reset-btn" onclick="resetAll()">↻ Reset Total</button>
     </div>
   </div>
 
   <script>
-    const manifestData = {
-      name: "Blackjack Counter Pro",
-      short_name: "BJ Counter",
-      start_url: ".",
-      display: "standalone",
-      background_color: "#0f2027",
-      theme_color: "#0f2027",
-      orientation: "portrait",
-      icons: [{
-        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%230f2027' width='512' height='512'/><text x='256' y='340' font-size='280' text-anchor='middle' fill='%234ade80'>♠</text></svg>",
-        sizes: "512x512",
-        type: "image/svg+xml"
-      }]
-    };
-
-    const blob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    document.getElementById('manifest-placeholder').setAttribute('href', url);
-
-    // MODELO
-    let activePlayers = [];
+    let gameState = 'welcome';
+    let playersBeforeMe = 0;
+    let playersAfterMe = 0;
+    let allPlayers = [];
     let currentPlayerIndex = 0;
-    let numOtherPlayers = -1;
-    const hands = { dealer: [], me: [], p1: [], p2: [], p3: [] };
-    let roundActive = false;
+    const hands = {};
+    let cardHistory = [];
     let runningCount = 0;
     let cardsPlayed = 0;
     let handsPlayed = 0;
@@ -529,134 +651,212 @@
 
     const allCards = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-    function selectPlayers(num) {
-      numOtherPlayers = num;
-      
-      // Configurar jugadores activos
-      activePlayers = ['dealer', 'me'];
-      for (let i = 1; i <= num; i++) {
-        activePlayers.push('p' + i);
-      }
-      
-      // Visual feedback
-      document.querySelectorAll('.player-option').forEach((el, idx) => {
-        el.classList.toggle('selected', idx === num);
-      });
-      
-      document.getElementById('startSetupBtn').disabled = false;
+    function showTutorial() {
+      document.getElementById('welcomeScreen').classList.add('hidden');
+      document.getElementById('tutorialScreen').classList.remove('hidden');
     }
 
-    function comenzarConSetup() {
-      if (numOtherPlayers === -1) return;
+    function goToSetup() {
+      document.getElementById('welcomeScreen').classList.add('hidden');
+      document.getElementById('tutorialScreen').classList.add('hidden');
+      document.getElementById('setupScreen').classList.remove('hidden');
+      document.getElementById('modeIndicator').classList.remove('hidden');
+      document.getElementById('statsArea').classList.remove('hidden');
+      document.getElementById('handsArea').classList.remove('hidden');
+      document.getElementById('infoFooter').classList.remove('hidden');
+      document.getElementById('resetArea').classList.remove('hidden');
+      gameState = 'setup';
+      updateModeIndicator();
+    }
+
+    function selectBefore(num) {
+      playersBeforeMe = num;
+      document.querySelectorAll('#beforeSelector .number-option').forEach((el, i) => {
+        el.classList.toggle('selected', i === num);
+      });
+      updateTableVisual();
+      checkCanStart();
+    }
+
+    function selectAfter(num) {
+      playersAfterMe = num;
+      document.querySelectorAll('#afterSelector .number-option').forEach((el, i) => {
+        el.classList.toggle('selected', i === num);
+      });
+      updateTableVisual();
+      checkCanStart();
+    }
+
+    function updateTableVisual() {
+      const container = document.getElementById('tablePositions');
+      let html = '';
       
-      // Limpiar manos
-      Object.keys(hands).forEach(k => hands[k] = []);
+      for (let i = 1; i <= playersBeforeMe; i++) {
+        html += `<div class="position-chip">P${i}</div>`;
+      }
+      
+      html += '<div class="position-chip me">🎮 TÚ</div>';
+      
+      for (let i = 1; i <= playersAfterMe; i++) {
+        html += `<div class="position-chip">P${playersBeforeMe + i}</div>`;
+      }
+      
+      html += '<div class="position-chip dealer">🃏 DEALER</div>';
+      
+      container.innerHTML = html;
+    }
+
+    function checkCanStart() {
+      document.getElementById('startGameBtn').disabled = false;
+    }
+
+    function startGame() {
+      allPlayers = [];
+      
+      for (let i = 1; i <= playersBeforeMe; i++) {
+        allPlayers.push({ id: `p${i}`, label: `👤 P${i}`, isMe: false });
+      }
+      
+      allPlayers.push({ id: 'me', label: '🎮 TÚ', isMe: true });
+      
+      for (let i = 1; i <= playersAfterMe; i++) {
+        allPlayers.push({ id: `p${playersBeforeMe + i}`, label: `👤 P${playersBeforeMe + i}`, isMe: false });
+      }
+      
+      allPlayers.push({ id: 'dealer', label: '🃏 Dealer', isMe: false });
+
+      allPlayers.forEach(p => hands[p.id] = []);
+      cardHistory = [];
       currentPlayerIndex = 0;
-      roundActive = true;
       handsPlayed++;
+      gameState = 'playing';
+
+      document.getElementById('setupScreen').classList.add('hidden');
+      document.getElementById('gameControls').classList.remove('hidden');
+      document.getElementById('cardsSection').classList.remove('hidden');
       
-      // Ocultar setup, mostrar controles
-      document.getElementById('setupScreen').style.display = 'none';
-      document.getElementById('gameControls').style.display = 'block';
-      document.querySelectorAll('.card-btn').forEach(b => b.disabled = false);
-      document.getElementById('aiBox').style.display = 'none';
-      
+      renderCards();
       updateModeIndicator();
       updateDisplay();
     }
 
-    function siguienteJugador() {
-      if (!roundActive) return;
+    function nextPlayer() {
+      if (gameState !== 'playing') return;
       currentPlayerIndex++;
-      if (currentPlayerIndex >= activePlayers.length) {
+      if (currentPlayerIndex >= allPlayers.length) {
         currentPlayerIndex = 0;
       }
       updateModeIndicator();
       updateDisplay();
     }
 
-    function terminarMano() {
-      roundActive = false;
+    function endHand() {
+      gameState = 'setup';
       currentPlayerIndex = 0;
       
-      // Volver a setup
-      document.getElementById('setupScreen').style.display = 'block';
-      document.getElementById('gameControls').style.display = 'none';
-      document.querySelectorAll('.card-btn').forEach(b => b.disabled = true);
-      document.getElementById('aiBox').style.display = 'none';
+      allPlayers.forEach(p => hands[p.id] = []);
+      cardHistory = [];
       
-      // Restaurar selección
-      document.querySelectorAll('.player-option').forEach((el, idx) => {
-        el.classList.toggle('selected', idx === numOtherPlayers);
+      document.getElementById('setupScreen').classList.remove('hidden');
+      document.getElementById('gameControls').classList.add('hidden');
+      document.getElementById('cardsSection').classList.add('hidden');
+      document.getElementById('aiBox').classList.add('hidden');
+      
+      document.querySelectorAll('#beforeSelector .number-option').forEach((el, i) => {
+        el.classList.toggle('selected', i === playersBeforeMe);
+      });
+      document.querySelectorAll('#afterSelector .number-option').forEach((el, i) => {
+        el.classList.toggle('selected', i === playersAfterMe);
       });
       
-      updateModeIndicator();
-      updateDisplay();
-    }
-
-    function resetTotal() {
-      if (!confirm('¿Reset total? Borra TODO el conteo.')) return;
-      runningCount = 0;
-      cardsPlayed = 0;
-      handsPlayed = 0;
-      numOtherPlayers = -1;
-      activePlayers = [];
-      Object.keys(hands).forEach(k => hands[k] = []);
-      roundActive = false;
-      currentPlayerIndex = 0;
-      
-      document.getElementById('setupScreen').style.display = 'block';
-      document.getElementById('gameControls').style.display = 'none';
-      document.querySelectorAll('.card-btn').forEach(b => b.disabled = true);
-      document.getElementById('aiBox').style.display = 'none';
-      document.getElementById('startSetupBtn').disabled = true;
-      document.querySelectorAll('.player-option').forEach(el => {
-        el.classList.remove('selected');
-      });
-      
+      updateTableVisual();
       updateModeIndicator();
       updateDisplay();
     }
 
     function addCard(card) {
-      if (!roundActive) return;
+      if (gameState !== 'playing') return;
+
+      const player = allPlayers[currentPlayerIndex];
+      
+      cardHistory.push({
+        player: player.id,
+        card: card,
+        rcBefore: runningCount,
+        cardsPlayedBefore: cardsPlayed
+      });
 
       runningCount += hiLoValues[card];
       cardsPlayed++;
-
-      const currentPlayer = activePlayers[currentPlayerIndex];
-      hands[currentPlayer].push(card);
+      hands[player.id].push(card);
 
       if (navigator.vibrate) navigator.vibrate(5);
 
       updateDisplay();
+    }
+
+    function undoLastCard() {
+      if (cardHistory.length === 0) return;
+
+      const last = cardHistory.pop();
       
-      // Auto-avance al siguiente jugador
-      setTimeout(() => siguienteJugador(), 200);
+      runningCount = last.rcBefore;
+      cardsPlayed = last.cardsPlayedBefore;
+      
+      const hand = hands[last.player];
+      if (hand.length > 0) {
+        hand.pop();
+      }
+
+      if (navigator.vibrate) navigator.vibrate(10);
+
+      updateDisplay();
+    }
+
+    function resetAll() {
+      if (!confirm('¿Resetear TODO?')) return;
+      
+      runningCount = 0;
+      cardsPlayed = 0;
+      handsPlayed = 0;
+      playersBeforeMe = 0;
+      playersAfterMe = 0;
+      allPlayers = [];
+      cardHistory = [];
+      currentPlayerIndex = 0;
+      Object.keys(hands).forEach(k => delete hands[k]);
+      
+      gameState = 'setup';
+      
+      document.getElementById('setupScreen').classList.remove('hidden');
+      document.getElementById('gameControls').classList.add('hidden');
+      document.getElementById('cardsSection').classList.add('hidden');
+      document.getElementById('aiBox').classList.add('hidden');
+      
+      document.querySelectorAll('.number-option').forEach(el => el.classList.remove('selected'));
+      document.getElementById('startGameBtn').disabled = true;
+      
+      updateTableVisual();
+      updateModeIndicator();
+      updateDisplay();
     }
 
     function updateModeIndicator() {
       const indicator = document.getElementById('modeIndicator');
       
-      if (!roundActive) {
-        indicator.textContent = '🎯 ¿Cuántos jugadores hay en la mesa?';
+      if (gameState === 'setup') {
+        indicator.textContent = '🎯 Configura la mesa';
         indicator.style.background = 'linear-gradient(135deg, #60a5fa, #3b82f6)';
         return;
       }
 
-      const player = activePlayers[currentPlayerIndex];
-      const labels = {
-        dealer: '🃏 DEALER - Toca su carta',
-        me: '🎮 TÚ - Toca tus cartas',
-        p1: '👤 JUGADOR 1 - Toca sus cartas',
-        p2: '👤 JUGADOR 2 - Toca sus cartas',
-        p3: '👤 JUGADOR 3 - Toca sus cartas'
-      };
-
-      indicator.textContent = labels[player];
-      indicator.style.background = player === 'me' ? 
-        'linear-gradient(135deg, #4ade80, #22c55e)' :
-        'linear-gradient(135deg, #fbbf24, #f59e0b)';
+      if (gameState === 'playing') {
+        const player = allPlayers[currentPlayerIndex];
+        indicator.textContent = `${player.label} - Toca sus cartas`;
+        indicator.style.background = player.isMe ? 
+          'linear-gradient(135deg, #4ade80, #22c55e)' :
+          'linear-gradient(135deg, #fbbf24, #f59e0b)';
+      }
     }
 
     function handValue(hand) {
@@ -681,7 +881,7 @@
     function updateDisplay() {
       const rc = document.getElementById('rc');
       rc.textContent = runningCount > 0 ? '+' + runningCount : runningCount;
-      rc.className = 'stat-mini-value';
+      rc.className = 'stat-value';
       if (runningCount > 0) rc.classList.add('positive');
       else if (runningCount < 0) rc.classList.add('negative');
       else rc.classList.add('neutral');
@@ -691,7 +891,7 @@
       
       const tc = document.getElementById('tc');
       tc.textContent = trueCount.toFixed(1);
-      tc.className = 'stat-mini-value';
+      tc.className = 'stat-value';
       if (trueCount > 1) tc.classList.add('positive');
       else if (trueCount < -1) tc.classList.add('negative');
       else tc.classList.add('neutral');
@@ -714,20 +914,21 @@
     function updateHandsDisplay() {
       const area = document.getElementById('handsArea');
       
-      if (!roundActive && hands.dealer.length === 0) {
-        area.innerHTML = '<div class="inactive-msg">Selecciona cuántos jugadores hay</div>';
+      if (gameState === 'setup') {
+        area.innerHTML = '<div style="text-align: center; opacity: 0.5; padding: 16px;">Configura la mesa</div>';
         return;
       }
 
-      const labels = { dealer: '🃏 Dealer', me: '🎮 Tú', p1: '👤 P1', p2: '👤 P2', p3: '👤 P3' };
       let html = '';
 
-      activePlayers.forEach(p => {
-        if (hands[p].length === 0) return;
+      allPlayers.forEach((player, idx) => {
+        const hand = hands[player.id];
+        if (hand.length === 0) return;
 
-        const total = handValue(hands[p]);
+        const total = handValue(hand);
         const isBust = total > 21;
-        const isBJ = isBlackjack(hands[p]);
+        const isBJ = isBlackjack(hand);
+        const isActive = idx === currentPlayerIndex && gameState === 'playing';
 
         let totalClass = 'hand-total';
         let totalText = total;
@@ -741,11 +942,11 @@
         }
 
         html += `
-          <div class="hand-row">
+          <div class="hand-row ${isActive ? 'active' : ''}">
             <div class="hand-info">
-              <div class="hand-label">${labels[p]}</div>
-              <div class="hand-cards-inline">
-                ${hands[p].map(c => `<span class="mini-card">${c}</span>`).join('')}
+              <div class="hand-label">${player.label}</div>
+              <div class="hand-cards">
+                ${hand.map(c => `<span class="mini-card">${c}</span>`).join('')}
               </div>
             </div>
             <div class="${totalClass}">${totalText}</div>
@@ -760,8 +961,8 @@
       const myHand = hands.me;
       const dealerHand = hands.dealer;
       
-      if (myHand.length === 0 || dealerHand.length === 0 || !roundActive) {
-        document.getElementById('aiBox').style.display = 'none';
+      if (!myHand || myHand.length === 0 || !dealerHand || dealerHand.length === 0 || gameState !== 'playing') {
+        document.getElementById('aiBox').classList.add('hidden');
         return;
       }
 
@@ -774,28 +975,25 @@
       
       const strategy = getStrategy(myTotal, dealerValue, myHand, trueCount);
       
-      document.getElementById('aiBox').style.display = 'block';
-      document.getElementById('aiAction').className = 'ai-action ' + strategy.class;
+      document.getElementById('aiBox').classList.remove('hidden');
+      document.getElementById('aiAction').className = 'ai-action ' + strategy.cls;
       document.getElementById('aiAction').textContent = strategy.emoji + ' ' + strategy.action;
       document.getElementById('aiReason').textContent = strategy.reason;
     }
 
     function getStrategy(myTotal, dealerValue, myHand, tc) {
       if (isBlackjack(myHand)) {
-        return { action: 'STAND', class: 'stand', emoji: '🎉', reason: '¡Blackjack! Ya ganaste.' };
+        return { action: 'STAND', cls: 'stand', emoji: '🎉', reason: '¡Blackjack! Ya ganaste.' };
       }
 
       if (myTotal > 21) {
-        return { action: 'BUST', class: 'stand', emoji: '💥', reason: 'Te pasaste de 21.' };
+        return { action: 'BUST', cls: 'stand', emoji: '💥', reason: 'Te pasaste de 21.' };
       }
 
       if (canSplit(myHand)) {
         const card = myHand[0];
         if (card === 'A' || card === '8') {
-          return { action: 'SPLIT', class: 'split', emoji: '✂️', reason: 'Siempre divide Ases y 8s.' };
-        }
-        if (card === '9' && dealerValue >= 2 && dealerValue <= 6) {
-          return { action: 'SPLIT', class: 'split', emoji: '✂️', reason: 'Divide 9s vs dealer débil (2-6).' };
+          return { action: 'SPLIT', cls: 'split', emoji: '✂️', reason: 'Siempre divide Ases y 8s.' };
         }
       }
 
@@ -804,89 +1002,78 @@
 
       if (softTotal) {
         if (myTotal >= 19) {
-          return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Soft 19+ es muy buena.' };
+          return { action: 'STAND', cls: 'stand', emoji: '✋', reason: 'Soft 19+ muy fuerte.' };
         }
         
         if (myTotal === 18) {
           if (dealerValue >= 9) {
-            return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Soft 18 vs 9/10/A: pide para mejorar.' };
+            return { action: 'HIT', cls: 'hit', emoji: '👆', reason: 'Soft 18 vs 9/10/A: mejora.' };
           }
           if (dealerValue >= 2 && dealerValue <= 6 && myHand.length === 2) {
-            return { action: 'DOUBLE', class: 'double', emoji: '💰', reason: 'Soft 18 vs débil: dobla.' };
+            return { action: 'DOUBLE', cls: 'double', emoji: '💰', reason: 'Soft 18 vs débil: dobla.' };
           }
-          return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Soft 18 es aceptable.' };
+          return { action: 'STAND', cls: 'stand', emoji: '✋', reason: 'Soft 18 decente.' };
         }
         
-        if (myTotal <= 17) {
-          return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Soft 17- siempre mejora.' };
-        }
+        return { action: 'HIT', cls: 'hit', emoji: '👆', reason: 'Soft 17- pide.' };
       }
 
       if (myTotal >= 17) {
-        return { action: 'STAND', class: 'stand', emoji: '✋', reason: '17+ es riesgoso pedir.' };
+        return { action: 'STAND', cls: 'stand', emoji: '✋', reason: '17+ evita riesgo.' };
       }
 
       if (myTotal >= 13 && myTotal <= 16) {
         if (myTotal === 16 && dealerValue === 10 && tc >= 0) {
-          return { action: 'STAND', class: 'stand', emoji: '✋', reason: '16 vs 10 con TC≥0: plántate (desviación).' };
-        }
-        
-        if (myTotal === 15 && dealerValue === 10 && tc >= 4) {
-          return { action: 'STAND', class: 'stand', emoji: '✋', reason: '15 vs 10 con TC≥4: plántate (desviación).' };
+          return { action: 'STAND', cls: 'stand', emoji: '✋', reason: '16 vs 10, TC≥0: plántate.' };
         }
         
         if (dealerValue >= 2 && dealerValue <= 6) {
-          return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Dealer débil (2-6) puede pasarse.' };
+          return { action: 'STAND', cls: 'stand', emoji: '✋', reason: 'Dealer débil puede bustearse.' };
         } else {
-          return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Dealer fuerte (7-A): mejora.' };
+          return { action: 'HIT', cls: 'hit', emoji: '👆', reason: 'Dealer fuerte: mejora.' };
         }
       }
 
       if (myTotal === 12) {
         if (dealerValue >= 4 && dealerValue <= 6) {
-          return { action: 'STAND', class: 'stand', emoji: '✋', reason: '12 vs 4-6: dealer débil.' };
+          return { action: 'STAND', cls: 'stand', emoji: '✋', reason: '12 vs 4-6: dealer débil.' };
         } else {
-          return { action: 'HIT', class: 'hit', emoji: '👆', reason: '12 vs 2-3 o 7+: pide.' };
+          return { action: 'HIT', cls: 'hit', emoji: '👆', reason: '12: pide.' };
         }
       }
 
       if (myTotal === 11) {
         if (myHand.length === 2) {
-          return { action: 'DOUBLE', class: 'double', emoji: '💰', reason: '11 es LA MEJOR para doblar.' };
+          return { action: 'DOUBLE', cls: 'double', emoji: '💰', reason: '11 perfecto para doblar.' };
         }
-        return { action: 'HIT', class: 'hit', emoji: '👆', reason: '11: pide para 21.' };
+        return { action: 'HIT', cls: 'hit', emoji: '👆', reason: '11: pide.' };
       }
 
       if (myTotal === 10) {
         if (myHand.length === 2 && dealerValue >= 2 && dealerValue <= 9) {
-          return { action: 'DOUBLE', class: 'double', emoji: '💰', reason: '10 vs 2-9: dobla.' };
+          return { action: 'DOUBLE', cls: 'double', emoji: '💰', reason: '10 vs 2-9: dobla.' };
         }
-        return { action: 'HIT', class: 'hit', emoji: '👆', reason: '10: pide.' };
+        return { action: 'HIT', cls: 'hit', emoji: '👆', reason: '10: pide.' };
       }
 
       if (myTotal === 9) {
         if (myHand.length === 2 && dealerValue >= 3 && dealerValue <= 6) {
-          return { action: 'DOUBLE', class: 'double', emoji: '💰', reason: '9 vs 3-6: dobla.' };
+          return { action: 'DOUBLE', cls: 'double', emoji: '💰', reason: '9 vs 3-6: dobla.' };
         }
-        return { action: 'HIT', class: 'hit', emoji: '👆', reason: '9: pide.' };
+        return { action: 'HIT', cls: 'hit', emoji: '👆', reason: '9: pide.' };
       }
 
-      if (myTotal <= 8) {
-        return { action: 'HIT', class: 'hit', emoji: '👆', reason: 'Total bajo: imposible pasarse.' };
-      }
-
-      return { action: 'STAND', class: 'stand', emoji: '✋', reason: 'Jugada conservadora.' };
+      return { action: 'HIT', cls: 'hit', emoji: '👆', reason: 'Total bajo: pide.' };
     }
 
     function renderCards() {
-      const grid = document.getElementById('cardsGrid');
+      const grid = document.getElementById('cardsSection');
       grid.innerHTML = '';
 
       allCards.forEach(card => {
         const btn = document.createElement('button');
         btn.className = 'card-btn';
         btn.textContent = card;
-        btn.disabled = !roundActive;
         btn.onclick = () => addCard(card);
 
         const value = hiLoValues[card];
@@ -898,20 +1085,7 @@
       });
     }
 
-    renderCards();
-    updateModeIndicator();
-    updateDisplay();
-
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', (e) => {
-      const now = Date.now();
-      if (now - lastTouchEnd <= 300) e.preventDefault();
-      lastTouchEnd = now;
-    }, false);
-
-    if ('wakeLock' in navigator) {
-      navigator.wakeLock.request('screen').catch(() => {});
-    }
+    updateTableVisual();
   </script>
 </body>
 </html>
