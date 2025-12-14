@@ -3,57 +3,113 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blackjack Counter Pro - Motor Completo</title>
+  <title>Blackjack Pro Bot - Mesa Completa</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; user-select:none; }
-    body { font-family:-apple-system,BlinkMacSystemFont,sans-serif; background:linear-gradient(135deg,#0f2027,#203a43,#2c5364); color:#fff; min-height:100vh; padding:16px; }
-    .container { max-width:900px; margin:0 auto; }
-    h1 { font-size:28px; text-align:center; margin-bottom:8px; background:linear-gradient(135deg,#4ade80,#60a5fa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .subtitle { text-align:center; font-size:11px; opacity:0.6; margin-bottom:20px; }
-    .box { background:rgba(255,255,255,0.1); backdrop-filter:blur(10px); border-radius:16px; padding:20px; margin-bottom:16px; }
-    .stats { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-bottom:16px; }
-    .stat { background:rgba(255,255,255,0.1); padding:10px; border-radius:10px; text-align:center; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,sans-serif; background:linear-gradient(135deg,#0a0e27,#1a1f3a,#2d1b4e); color:#fff; min-height:100vh; padding:16px; }
+    .container { max-width:1400px; margin:0 auto; }
+    h1 { font-size:28px; text-align:center; margin-bottom:8px; background:linear-gradient(135deg,#fbbf24,#f59e0b); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .subtitle { text-align:center; font-size:11px; opacity:0.7; margin-bottom:20px; }
+    .box { background:rgba(255,255,255,0.08); backdrop-filter:blur(10px); border-radius:12px; padding:20px; margin-bottom:16px; border:1px solid rgba(255,255,255,0.1); }
+    
+    /* STATS */
+    .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; margin-bottom:16px; }
+    .stat { background:rgba(255,255,255,0.1); padding:12px; border-radius:8px; text-align:center; }
     .stat-label { font-size:9px; opacity:0.7; text-transform:uppercase; margin-bottom:4px; }
-    .stat-value { font-size:18px; font-weight:900; }
+    .stat-value { font-size:20px; font-weight:900; }
     .positive { color:#4ade80; }
     .negative { color:#ef4444; }
     .neutral { color:#60a5fa; }
-    .warning { color:#fbbf24; }
-    .btn { padding:12px 16px; font-size:14px; font-weight:800; border:none; border-radius:10px; cursor:pointer; text-transform:uppercase; }
+    .warning { color:#fbbf24; animation:pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity:1; } 50% { opacity:0.6; } }
+    
+    /* MESA DE JUEGO */
+    .table-container { background:linear-gradient(135deg,#0d5f1f,#1a472a); border-radius:20px; padding:30px; margin-bottom:20px; border:3px solid #2d7a3f; box-shadow:0 10px 40px rgba(0,0,0,0.5); }
+    
+    .dealer-area { text-align:center; margin-bottom:40px; }
+    .dealer-title { font-size:16px; font-weight:700; margin-bottom:12px; color:#fbbf24; }
+    .dealer-cards { display:flex; gap:8px; justify-content:center; margin-bottom:10px; min-height:80px; }
+    
+    .players-area { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:30px; }
+    .player-box { background:rgba(0,0,0,0.3); border-radius:12px; padding:16px; border:2px solid rgba(255,255,255,0.2); transition:all 0.3s; }
+    .player-box.active { border-color:#4ade80; box-shadow:0 0 20px rgba(74,222,128,0.3); }
+    .player-box.you { border-color:#fbbf24; background:rgba(251,191,36,0.15); }
+    .player-title { font-size:14px; font-weight:700; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+    .player-cards { display:flex; gap:6px; flex-wrap:wrap; min-height:70px; margin-bottom:8px; }
+    .player-total { font-size:16px; font-weight:700; opacity:0.8; }
+    
+    .card { width:45px; height:65px; background:#fff; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900; color:#000; box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+    .card.hidden { background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; font-size:14px; }
+    
+    /* CONTROLES DE REGISTRO */
+    .register-controls { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+    .register-btn { padding:20px; font-size:15px; font-weight:800; border:none; border-radius:12px; cursor:pointer; transition:all 0.2s; }
+    .register-btn:hover { transform:translateY(-2px); }
+    .register-btn.my-card { background:linear-gradient(135deg,#fbbf24,#f59e0b); color:#000; }
+    .register-btn.table-card { background:linear-gradient(135deg,#60a5fa,#3b82f6); color:#fff; }
+    .register-btn.dealer-card { background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; }
+    
+    /* SELECTOR DE CARTAS */
+    .card-selector { display:grid; grid-template-columns:repeat(13,1fr); gap:5px; margin-bottom:16px; }
+    .card-btn { aspect-ratio:1; font-size:15px; font-weight:900; border:none; border-radius:6px; cursor:pointer; color:#fff; transition:all 0.15s; }
+    .card-btn:hover { transform:scale(1.1); box-shadow:0 4px 12px rgba(0,0,0,0.4); }
+    .card-btn:active { transform:scale(0.95); }
+    .card-btn.low { background:linear-gradient(135deg,#4ade80,#22c55e); }
+    .card-btn.mid { background:linear-gradient(135deg,#60a5fa,#3b82f6); }
+    .card-btn.high { background:linear-gradient(135deg,#ef4444,#dc2626); }
+    
+    /* AI PANEL */
+    .ai-panel { background:linear-gradient(135deg,rgba(74,222,128,0.12),rgba(34,197,94,0.08)); border:2px solid rgba(74,222,128,0.3); border-radius:12px; padding:20px; margin-bottom:16px; position:relative; }
+    .ai-panel::before { content:'🤖'; position:absolute; top:16px; right:20px; font-size:28px; opacity:0.4; }
+    .ai-action { font-size:26px; font-weight:900; margin-bottom:10px; }
+    .ai-reason { font-size:12px; opacity:0.8; line-height:1.4; margin-bottom:8px; }
+    .ai-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px; }
+    .ai-stat { background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; text-align:center; font-size:11px; }
+    
+    /* HUMANIZER */
+    .humanizer { background:rgba(251,191,36,0.12); border:2px solid rgba(251,191,36,0.4); border-radius:10px; padding:14px; margin-bottom:16px; display:none; }
+    .humanizer.active { display:block; animation:slideIn 0.4s; }
+    @keyframes slideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+    
+    /* BUTTONS */
+    .btn-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-bottom:16px; }
+    .btn { padding:14px; font-size:13px; font-weight:800; border:none; border-radius:10px; cursor:pointer; text-transform:uppercase; transition:all 0.2s; }
+    .btn:hover { transform:translateY(-2px); }
     .btn-primary { background:linear-gradient(135deg,#4ade80,#22c55e); color:#000; }
     .btn-secondary { background:linear-gradient(135deg,#60a5fa,#3b82f6); color:#fff; }
     .btn-danger { background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; }
     .btn-warning { background:linear-gradient(135deg,#fbbf24,#f59e0b); color:#000; }
-    .flex { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
-    .cards { display:grid; grid-template-columns:repeat(13,1fr); gap:6px; margin-bottom:16px; }
-    .card { aspect-ratio:1; font-size:18px; font-weight:900; border:none; border-radius:10px; cursor:pointer; color:#fff; border:2px solid rgba(255,255,255,0.2); }
-    .card.low { background:linear-gradient(135deg,#4ade80,#22c55e); }
-    .card.mid { background:linear-gradient(135deg,#60a5fa,#3b82f6); }
-    .card.high { background:linear-gradient(135deg,#ef4444,#dc2626); }
-    .ai { background:linear-gradient(135deg,rgba(74,222,128,0.2),rgba(34,197,94,0.15)); border:2px solid rgba(74,222,128,0.4); border-radius:12px; padding:14px; margin-bottom:16px; position:relative; }
-    .ai::before { content:'🤖'; position:absolute; top:10px; right:14px; font-size:18px; }
-    .ai-action { font-size:24px; font-weight:900; margin-bottom:6px; }
-    .ai-reason { font-size:12px; opacity:0.8; line-height:1.4; }
-    .alert { background:rgba(251,191,36,0.2); border:2px solid rgba(251,191,36,0.5); border-radius:12px; padding:12px; margin-bottom:16px; }
-    .alert-text { font-size:13px; line-height:1.5; }
-    .log { background:rgba(0,0,0,0.4); border-radius:10px; padding:12px; max-height:200px; overflow-y:auto; font-size:11px; line-height:1.6; font-family:monospace; }
+    .btn:disabled { opacity:0.5; cursor:not-allowed; }
+    
+    /* LOG */
+    .log { background:rgba(0,0,0,0.5); border-radius:10px; padding:14px; max-height:250px; overflow-y:auto; font-size:10px; line-height:1.6; font-family:monospace; }
     .log-entry { padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.1); }
-    .config-grid { display:grid; gap:12px; }
+    .log-success { color:#4ade80; }
+    .log-error { color:#ef4444; }
+    .log-warning { color:#fbbf24; }
+    
+    /* CONFIG */
+    .config-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
     .form-group { margin-bottom:12px; }
-    .form-label { font-size:12px; font-weight:700; margin-bottom:6px; display:block; }
-    .form-input, .form-select { width:100%; padding:8px; border-radius:8px; border:2px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.3); color:#fff; font-size:14px; }
-    .checkbox { display:flex; align-items:center; gap:8px; padding:8px; background:rgba(0,0,0,0.3); border-radius:8px; cursor:pointer; }
+    .form-label { font-size:11px; font-weight:700; margin-bottom:6px; display:block; }
+    .form-input, .form-select { width:100%; padding:8px; border-radius:6px; border:2px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.3); color:#fff; font-size:13px; }
+    .checkbox { display:flex; align-items:center; gap:8px; padding:8px; background:rgba(0,0,0,0.3); border-radius:6px; cursor:pointer; }
     .checkbox input { width:18px; height:18px; cursor:pointer; }
+    
+    details { margin-bottom:14px; }
+    summary { cursor:pointer; padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; font-weight:700; font-size:13px; }
+    details[open] summary { margin-bottom:12px; }
+    
     .hidden { display:none !important; }
-    details { margin-bottom:16px; }
-    summary { cursor:pointer; padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; font-weight:700; }
+    .phase-indicator { text-align:center; font-size:14px; font-weight:700; color:#4ade80; margin-bottom:16px; padding:10px; background:rgba(74,222,128,0.1); border-radius:8px; }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>♠️ BLACKJACK COUNTER PRO</h1>
-  <div class="subtitle">Motor Completo: Hi-Lo + Illustrious 18 + Humanizer + Auto-Sim</div>
+  <h1>🎰 BLACKJACK PRO BOT</h1>
+  <div class="subtitle">MESA COMPLETA • HI-LO • ILLUSTRIOUS 18 • TRACKING MULTI-JUGADOR</div>
 
+  <!-- STATS -->
   <div class="stats">
     <div class="stat">
       <div class="stat-label">RC</div>
@@ -68,140 +124,215 @@
       <div class="stat-value neutral" id="bet">$10</div>
     </div>
     <div class="stat">
-      <div class="stat-label">Banco</div>
-      <div class="stat-value neutral" id="bank">$1000</div>
+      <div class="stat-label">Bankroll</div>
+      <div class="stat-value neutral" id="bankroll">$1000</div>
     </div>
     <div class="stat">
-      <div class="stat-label">Penetración</div>
+      <div class="stat-label">Edge</div>
+      <div class="stat-value neutral" id="edge">0.0%</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Penetr.</div>
       <div class="stat-value neutral" id="penetration">0%</div>
     </div>
     <div class="stat">
-      <div class="stat-label">Modo</div>
-      <div class="stat-value neutral" id="mode">Manual</div>
+      <div class="stat-label">Manos</div>
+      <div class="stat-value neutral" id="hands">0</div>
     </div>
   </div>
 
-  <div class="alert hidden" id="alert">
-    <div class="alert-text" id="alertText"></div>
+  <!-- HUMANIZER ALERT -->
+  <div class="humanizer" id="humanizerAlert">
+    <div id="humanizerText"></div>
   </div>
 
-  <div class="flex">
-    <button class="btn btn-primary" onclick="toggleAuto()">▶️ AUTO-SIMULAR</button>
-    <button class="btn btn-secondary" onclick="newHand()">⏭️ NUEVA MANO</button>
+  <!-- PHASE INDICATOR -->
+  <div class="phase-indicator" id="phaseIndicator">Esperando inicio de mano...</div>
+
+  <!-- MESA DE JUEGO -->
+  <div class="table-container">
+    <!-- DEALER -->
+    <div class="dealer-area">
+      <div class="dealer-title">🎴 DEALER</div>
+      <div class="dealer-cards" id="dealerCards"></div>
+      <div id="dealerTotal" style="font-size:16px; font-weight:700; opacity:0.8;"></div>
+    </div>
+
+    <!-- JUGADORES -->
+    <div class="players-area" id="playersArea"></div>
+  </div>
+
+  <!-- CONTROLES DE REGISTRO -->
+  <div class="box">
+    <h3 style="margin-bottom:14px; font-size:15px;">📝 Registrar Cartas</h3>
+    
+    <div class="register-controls">
+      <button class="register-btn my-card" onclick="setRegisterMode('myCard')">
+        <div style="font-size:24px; margin-bottom:6px;">👤</div>
+        <div>MI CARTA</div>
+        <div style="font-size:10px; opacity:0.7; margin-top:4px;">Para mi mano</div>
+      </button>
+      <button class="register-btn table-card" onclick="setRegisterMode('tableCard')">
+        <div style="font-size:24px; margin-bottom:6px;">👥</div>
+        <div>CARTA MESA</div>
+        <div style="font-size:10px; opacity:0.7; margin-top:4px;">Otros jugadores</div>
+      </button>
+      <button class="register-btn dealer-card" onclick="setRegisterMode('dealerCard')">
+        <div style="font-size:24px; margin-bottom:6px;">🎴</div>
+        <div>CARTA DEALER</div>
+        <div style="font-size:10px; opacity:0.7; margin-top:4px;">Dealer visible</div>
+      </button>
+    </div>
+
+    <div style="margin-bottom:10px; text-align:center; font-size:13px; font-weight:700; color:#4ade80;" id="registerModeText">
+      Selecciona un modo arriba
+    </div>
+
+    <div class="card-selector" id="cardSelector"></div>
+  </div>
+
+  <!-- AI PANEL -->
+  <div class="ai-panel">
+    <div class="ai-action" id="aiAction">⏳ Esperando tu mano...</div>
+    <div class="ai-reason" id="aiReason">Registra tus cartas y la carta visible del dealer para obtener recomendación</div>
+    <div class="ai-stats">
+      <div class="ai-stat">
+        <div style="opacity:0.7;">Decisión</div>
+        <div style="font-weight:700; margin-top:4px;" id="aiDecision">-</div>
+      </div>
+      <div class="ai-stat">
+        <div style="opacity:0.7;">Índice TC</div>
+        <div style="font-weight:700; margin-top:4px;" id="aiIndex">-</div>
+      </div>
+      <div class="ai-stat">
+        <div style="opacity:0.7;">Confianza</div>
+        <div style="font-weight:700; margin-top:4px;" id="aiConfidence">100%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="newHand()">🆕 NUEVA MANO</button>
+    <button class="btn btn-secondary" onclick="calculateDecision()">🧠 CALCULAR</button>
     <button class="btn btn-warning" onclick="shuffle()">🔄 SHUFFLE</button>
     <button class="btn btn-danger" onclick="resetAll()">↻ RESET</button>
   </div>
 
-  <div class="box">
-    <h3 style="margin-bottom:12px;">Cartas Vistas (Click para registrar)</h3>
-    <div class="cards" id="cardGrid"></div>
-  </div>
+  <!-- ESTADÍSTICAS -->
+  <details open>
+    <summary>📊 ESTADÍSTICAS DE SESIÓN</summary>
+    <div class="box">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; text-align:center;">
+        <div>
+          <div style="font-size:10px; opacity:0.7;">Manos Jugadas</div>
+          <div style="font-size:24px; font-weight:900;" id="statHands">0</div>
+        </div>
+        <div>
+          <div style="font-size:10px; opacity:0.7;">W / L / P</div>
+          <div style="font-size:20px; font-weight:900;"><span id="statWins">0</span>/<span id="statLosses">0</span>/<span id="statPush">0</span></div>
+        </div>
+        <div>
+          <div style="font-size:10px; opacity:0.7;">Win Rate</div>
+          <div style="font-size:24px; font-weight:900;" id="statWinRate">0%</div>
+        </div>
+        <div>
+          <div style="font-size:10px; opacity:0.7;">Profit</div>
+          <div style="font-size:24px; font-weight:900;" id="statProfit">$0</div>
+        </div>
+        <div>
+          <div style="font-size:10px; opacity:0.7;">Errores Camuflaje</div>
+          <div style="font-size:24px; font-weight:900;" id="statErrors">0</div>
+        </div>
+      </div>
+    </div>
+  </details>
 
-  <div class="ai" id="ai">
-    <div class="ai-action" id="aiAction">Esperando cartas...</div>
-    <div class="ai-reason" id="aiReason">Sistema listo para analizar</div>
-  </div>
-
+  <!-- CONFIGURACIÓN -->
   <details>
-    <summary>⚙️ CONFIGURACIÓN AVANZADA</summary>
+    <summary>⚙️ CONFIGURACIÓN DE MESA</summary>
     <div class="box config-grid">
+      <div class="form-group">
+        <label class="form-label">Jugadores en la Mesa</label>
+        <select class="form-select" id="numPlayers" onchange="updateConfig()">
+          <option value="1">1 (Solo tú)</option>
+          <option value="2">2 jugadores</option>
+          <option value="3" selected>3 jugadores</option>
+          <option value="4">4 jugadores</option>
+          <option value="5">5 jugadores</option>
+          <option value="6">6 jugadores</option>
+          <option value="7">7 jugadores (lleno)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tu Posición</label>
+        <select class="form-select" id="yourPosition" onchange="updateConfig()">
+          <option value="1" selected>Posición 1 (Primera base)</option>
+          <option value="2">Posición 2</option>
+          <option value="3">Posición 3 (Tercera base)</option>
+        </select>
+      </div>
       <div class="form-group">
         <label class="form-label">Número de Mazos</label>
         <select class="form-select" id="numDecks" onchange="updateConfig()">
           <option value="1">1 mazo</option>
           <option value="2">2 mazos</option>
-          <option value="4">4 mazos</option>
           <option value="6" selected>6 mazos</option>
           <option value="8">8 mazos</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Penetración del Zapato (%)</label>
+        <label class="form-label">Penetración (%)</label>
         <input type="number" class="form-input" id="penetrationPct" value="75" min="50" max="95" onchange="updateConfig()">
       </div>
       <div class="form-group">
-        <label class="form-label">Bankroll Inicial ($)</label>
+        <label class="form-label">Bankroll ($)</label>
         <input type="number" class="form-input" id="initialBank" value="1000" min="100" onchange="updateConfig()">
       </div>
       <div class="form-group">
-        <label class="form-label">Apuesta Mínima ($)</label>
+        <label class="form-label">Apuesta Mín ($)</label>
         <input type="number" class="form-input" id="minBet" value="10" min="1" onchange="updateConfig()">
       </div>
       <div class="form-group">
-        <label class="form-label">Modo de Juego</label>
-        <select class="form-select" id="playMode" onchange="updateConfig()">
-          <option value="optimal">Óptimo (100% perfecto)</option>
-          <option value="realistic" selected>Realista (errores humanos)</option>
-          <option value="training">Entrenamiento</option>
-        </select>
+        <label class="form-label">Spread Máx</label>
+        <input type="number" class="form-input" id="maxSpread" value="12" min="2" max="20" onchange="updateConfig()">
       </div>
       <div class="form-group">
-        <label class="form-label">Tasa de Errores (%) - Solo modo Realista</label>
-        <input type="number" class="form-input" id="errorRate" value="3" min="0" max="15" onchange="updateConfig()">
+        <label class="form-label">Tasa Errores (%)</label>
+        <input type="number" class="form-input" id="errorRate" value="2" min="0" max="10" onchange="updateConfig()">
       </div>
-      <label class="checkbox">
-        <input type="checkbox" id="dealerHitsSoft17" onchange="updateConfig()">
-        <span>Dealer hits soft 17</span>
-      </label>
-      <label class="checkbox">
-        <input type="checkbox" id="doubleAfterSplit" checked onchange="updateConfig()">
-        <span>Double after split</span>
-      </label>
       <label class="checkbox">
         <input type="checkbox" id="surrender" checked onchange="updateConfig()">
-        <span>Late surrender</span>
+        <span>Late Surrender</span>
       </label>
       <label class="checkbox">
-        <input type="checkbox" id="resplitAces" onchange="updateConfig()">
-        <span>Resplit aces</span>
+        <input type="checkbox" id="enableHumanizer" checked onchange="updateConfig()">
+        <span>Humanizer (Camuflaje)</span>
       </label>
     </div>
   </details>
 
+  <!-- LOG -->
   <details>
-    <summary>📊 ESTADÍSTICAS DE SESIÓN</summary>
-    <div class="box">
-      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; text-align:center;">
-        <div>
-          <div style="font-size:11px; opacity:0.7;">Manos Jugadas</div>
-          <div style="font-size:24px; font-weight:900;" id="totalHands">0</div>
-        </div>
-        <div>
-          <div style="font-size:11px; opacity:0.7;">Ganancia/Pérdida</div>
-          <div style="font-size:24px; font-weight:900;" id="profit">$0</div>
-        </div>
-        <div>
-          <div style="font-size:11px; opacity:0.7;">Win Rate</div>
-          <div style="font-size:24px; font-weight:900;" id="winRate">0%</div>
-        </div>
-      </div>
-    </div>
-  </details>
-
-  <details>
-    <summary>📋 REGISTRO DE JUEGO</summary>
+    <summary>📋 REGISTRO DETALLADO</summary>
     <div class="log" id="log"></div>
   </details>
 </div>
 
 <script>
-// ==================== CORE ENGINE ====================
-
-// 1. RULES
-const RULES = {
+const CONFIG = {
+  numPlayers: 3,
+  yourPosition: 1,
   decks: 6,
   penetration: 0.75,
-  dealerHitsSoft17: false,
-  doubleAfterSplit: true,
   surrender: true,
-  resplitAces: false,
   bankroll: 1000,
   minBet: 10,
-  playMode: 'realistic',
-  errorRate: 3
+  maxSpread: 12,
+  errorRate: 2,
+  enableHumanizer: true
 };
 
-// 2. HI-LO SYSTEM
 const HI_LO = {
   '2':1, '3':1, '4':1, '5':1, '6':1,
   '7':0, '8':0, '9':0,
@@ -215,9 +346,8 @@ const CARD_VALUES = {
 
 const ALL_CARDS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 
-// 3. ILLUSTRIOUS 18
 const ILLUSTRIOUS_18 = {
-  'insurance': 3,
+  insurance: 3,
   '16v10': 0,
   '15v10': 4,
   '13v2': -1,
@@ -225,19 +355,15 @@ const ILLUSTRIOUS_18 = {
   '12v2': 3,
   '12v3': 2,
   '12v4': 0,
-  '12v5': -2,
-  '12v6': -1,
   '11vA': 1,
   '10v10': 4,
   '10vA': 4,
   '9v2': 1,
   '9v7': 3,
   '20v5': 5,
-  '20v6': 4,
-  '16v9': 5
+  '20v6': 4
 };
 
-// 4. STATE
 let state = {
   runningCount: 0,
   cardsPlayed: 0,
@@ -245,132 +371,73 @@ let state = {
   handsPlayed: 0,
   handsWon: 0,
   handsLost: 0,
-  autoMode: false,
-  gameLog: [],
-  lastHand: { player: [], dealer: [] }
+  handsPush: 0,
+  humanErrors: 0,
+  registerMode: null,
+  currentPhase: 'waiting',
+  players: [],
+  dealer: { cards: [], visibleCard: null },
+  myCards: [],
+  gameLog: []
 };
 
-// 5. SHOE CLASS
 class Shoe {
   constructor(numDecks) {
     this.numDecks = numDecks;
     this.totalCards = numDecks * 52;
     this.reset();
   }
-  
   reset() {
     this.cards = [];
     for(let d = 0; d < this.numDecks; d++) {
-      for(let suit = 0; suit < 4; suit++) {
-        ALL_CARDS.forEach(card => this.cards.push(card));
+      for(let s = 0; s < 4; s++) {
+        ALL_CARDS.forEach(c => this.cards.push(c));
       }
     }
     this.shuffle();
   }
-  
   shuffle() {
     for(let i = this.cards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
     }
   }
-  
-  draw() {
-    if(this.cards.length === 0) this.reset();
-    return this.cards.pop();
-  }
-  
   needsShuffle(penetration) {
     return (this.cards.length / this.totalCards) < (1 - penetration);
   }
+  getDecksRemaining() {
+    return Math.max(0.5, this.cards.length / 52);
+  }
 }
 
-let shoe = new Shoe(RULES.decks);
+let shoe = new Shoe(CONFIG.decks);
 
-// 6. COUNTER
 class Counter {
-  static trueCount(rc, cardsPlayed, totalCards) {
-    const decksRemaining = Math.max(0.5, (totalCards - cardsPlayed) / 52);
-    return Math.trunc(rc / decksRemaining); // Truncamiento profesional
-  }
-  
   static updateCount(card) {
     state.runningCount += HI_LO[card];
     state.cardsPlayed++;
   }
-}
-
-// 7. BANKROLL
-class Bankroll {
-  static getBet(tc) {
-    const edge = tc * 0.005; // ~0.5% edge per TC
-    let bet = RULES.minBet;
-    
-    if(tc <= 0) return RULES.minBet;
-    
-    // Kelly-based betting
-    if(edge > 0 && RULES.playMode !== 'training') {
-      const kellyFraction = 0.5;
-      const kellyBet = state.currentBankroll * edge * kellyFraction;
-      bet = Math.max(RULES.minBet, Math.min(kellyBet, RULES.minBet * 10));
-    } else {
-      // Spread simple
-      if(tc === 1) bet = RULES.minBet * 2;
-      else if(tc === 2) bet = RULES.minBet * 3;
-      else if(tc === 3) bet = RULES.minBet * 5;
-      else if(tc >= 4) bet = RULES.minBet * 8;
-    }
-    
-    return Math.round(bet);
+  static trueCount() {
+    return Math.trunc(state.runningCount / shoe.getDecksRemaining());
   }
-  
-  static win(amount) {
-    state.currentBankroll += amount;
-    state.handsWon++;
-  }
-  
-  static lose(amount) {
-    state.currentBankroll -= amount;
-    state.handsLost++;
-  }
-  
-  static push() {
-    // No cambia bankroll
+  static calculateEdge(tc) {
+    return tc * 0.005;
   }
 }
 
-// 8. HUMANIZER (ERRORES REALISTAS)
-class Humanizer {
-  static shouldMakeError(tc, betSize, handsPlayed) {
-    if(RULES.playMode !== 'realistic') return false;
-    
-    let errorProb = RULES.errorRate / 100;
-    
-    // Más errores cuando:
-    if(tc <= 0) errorProb *= 1.5; // Conteo neutral/negativo
-    if(handsPlayed > 200) errorProb *= 1.2; // Fatiga
-    if(betSize > RULES.minBet * 5) errorProb *= 0.5; // Cuidado con apuestas altas
-    
-    // Nunca errores cuando TC >= +4 (oportunidad crítica)
-    if(tc >= 4) errorProb = 0;
-    
-    return Math.random() < errorProb;
-  }
-  
-  static introduceError(optimalAction) {
-    const alternatives = {
-      'HIT': ['STAND'],
-      'STAND': ['HIT'],
-      'DOUBLE': ['HIT'],
-      'SPLIT': ['HIT']
-    };
-    
-    const options = alternatives[optimalAction] || ['STAND'];
-    return options[Math.floor(Math.random() * options.length)];
+class BetManager {
+  static getSuggestedBet(tc) {
+    if(tc <= 0) return CONFIG.minBet;
+    let units = 1;
+    if(tc >= 5) units = CONFIG.maxSpread;
+    else if(tc >= 4) units = Math.min(10, CONFIG.maxSpread);
+    else if(tc >= 3) units = Math.min(6, CONFIG.maxSpread);
+    else if(tc >= 2) units = Math.min(4, CONFIG.maxSpread);
+    else if(tc >= 1) units = 2;
+    return Math.min(CONFIG.minBet * units, state.currentBankroll * 0.05);
   }
 }
 
-// 9. STRATEGY (con Illustrious 18)
 class Strategy {
   static getOptimalPlay(playerHand, dealerCard, tc) {
     const myTotal = this.handValue(playerHand);
@@ -378,160 +445,125 @@ class Strategy {
     const soft = this.isSoft(playerHand);
     const pair = this.isPair(playerHand);
     
-    // Blackjack
     if(playerHand.length === 2 && myTotal === 21) {
-      return { action: 'STAND', emoji: '🎉', reason: 'Blackjack natural (21)' };
+      return { action: 'BLACKJACK', emoji: '🎉', reason: 'Blackjack natural (paga 3:2)', index: null };
     }
-    
-    // Bust
     if(myTotal > 21) {
-      return { action: 'BUST', emoji: '💥', reason: 'Te pasaste de 21' };
+      return { action: 'BUST', emoji: '💥', reason: 'Pasado de 21', index: null };
     }
-    
-    // INSURANCE (Illustrious 18)
     if(dealerCard === 'A' && tc >= ILLUSTRIOUS_18.insurance) {
-      return { action: 'INSURANCE', emoji: '🛡️', reason: `Seguro TC≥+${ILLUSTRIOUS_18.insurance} (Ill-18)` };
+      return { action: 'INSURANCE', emoji: '🛡️', reason: `TC≥+${ILLUSTRIOUS_18.insurance}: tomar seguro`, index: ILLUSTRIOUS_18.insurance };
     }
-    
-    // SURRENDER
-    if(RULES.surrender && playerHand.length === 2) {
-      if(myTotal === 16 && dealerValue >= 9) {
-        return { action: 'SURRENDER', emoji: '🏳️', reason: '16 vs 9/10/A: surrender' };
+    if(CONFIG.surrender && playerHand.length === 2) {
+      if(myTotal === 16 && dealerValue === 10) {
+        if(tc >= ILLUSTRIOUS_18['16v10']) {
+          return { action: 'STAND', emoji: '✋', reason: `16v10 TC≥${ILLUSTRIOUS_18['16v10']}: plantarse (Ill-18)`, index: ILLUSTRIOUS_18['16v10'] };
+        }
+        return { action: 'SURRENDER', emoji: '🏳️', reason: '16v10: surrender óptimo', index: null };
       }
       if(myTotal === 15 && dealerValue === 10) {
-        return { action: 'SURRENDER', emoji: '🏳️', reason: '15 vs 10: surrender' };
+        if(tc >= ILLUSTRIOUS_18['15v10']) {
+          return { action: 'STAND', emoji: '✋', reason: `15v10 TC≥+${ILLUSTRIOUS_18['15v10']}: plantarse (Ill-18)`, index: ILLUSTRIOUS_18['15v10'] };
+        }
+        return { action: 'SURRENDER', emoji: '🏳️', reason: '15v10: surrender', index: null };
       }
     }
-    
-    // PAIRS
     if(pair) {
       const card = playerHand[0];
       if(card === 'A' || card === '8') {
-        return { action: 'SPLIT', emoji: '✂️', reason: 'Siempre divide Ases y 8s' };
+        return { action: 'SPLIT', emoji: '✂️', reason: 'Siempre divide Ases y 8s', index: null };
       }
-      
-      // 10,10 splits (Illustrious 18)
       if(CARD_VALUES[card] === 10) {
         if(dealerValue === 5 && tc >= ILLUSTRIOUS_18['20v5']) {
-          return { action: 'SPLIT', emoji: '✂️', reason: `10,10 vs 5 TC≥+${ILLUSTRIOUS_18['20v5']} (Ill-18)` };
+          return { action: 'SPLIT', emoji: '✂️', reason: `20v5 TC≥+${ILLUSTRIOUS_18['20v5']}: divide (Ill-18)`, index: ILLUSTRIOUS_18['20v5'] };
         }
         if(dealerValue === 6 && tc >= ILLUSTRIOUS_18['20v6']) {
-          return { action: 'SPLIT', emoji: '✂️', reason: `10,10 vs 6 TC≥+${ILLUSTRIOUS_18['20v6']} (Ill-18)` };
+          return { action: 'SPLIT', emoji: '✂️', reason: `20v6 TC≥+${ILLUSTRIOUS_18['20v6']}: divide (Ill-18)`, index: ILLUSTRIOUS_18['20v6'] };
         }
-        return { action: 'STAND', emoji: '✋', reason: '20 excelente' };
+        return { action: 'STAND', emoji: '✋', reason: '20 excelente, no dividir', index: null };
       }
     }
-    
-    // SOFT HANDS
     if(soft) {
-      if(myTotal >= 19) {
-        return { action: 'STAND', emoji: '✋', reason: 'Soft 19+ muy fuerte' };
-      }
+      if(myTotal >= 19) return { action: 'STAND', emoji: '✋', reason: 'Soft 19+ muy fuerte', index: null };
       if(myTotal === 18) {
-        if(dealerValue >= 9) {
-          return { action: 'HIT', emoji: '👆', reason: 'Soft 18 vs 9/10/A: mejora' };
-        }
+        if(dealerValue >= 9) return { action: 'HIT', emoji: '👆', reason: 'Soft 18 vs 9/10/A: mejora', index: null };
         if(dealerValue >= 2 && dealerValue <= 6 && playerHand.length === 2) {
-          return { action: 'DOUBLE', emoji: '💰', reason: 'Soft 18 vs débil: dobla' };
+          return { action: 'DOUBLE', emoji: '💰', reason: 'Soft 18 vs débil: dobla', index: null };
         }
-        return { action: 'STAND', emoji: '✋', reason: 'Soft 18 aceptable' };
+        return { action: 'STAND', emoji: '✋', reason: 'Soft 18 aceptable', index: null };
       }
-      return { action: 'HIT', emoji: '👆', reason: 'Soft 17- pide' };
+      if(dealerValue >= 4 && dealerValue <= 6 && playerHand.length === 2) {
+        return { action: 'DOUBLE', emoji: '💰', reason: 'Soft vs débil: dobla', index: null };
+      }
+      return { action: 'HIT', emoji: '👆', reason: 'Soft bajo: pide', index: null };
     }
     
-    // HARD HANDS con Illustrious 18
-    
-    // 16 vs 10 (Illustrious 18)
-    if(myTotal === 16 && dealerValue === 10) {
-      if(tc >= ILLUSTRIOUS_18['16v10']) {
-        return { action: 'STAND', emoji: '✋', reason: `16 vs 10 TC≥${ILLUSTRIOUS_18['16v10']} (Ill-18)` };
-      }
-      return { action: 'HIT', emoji: '👆', reason: '16 vs 10: pide (TC bajo)' };
-    }
-    
-    // 15 vs 10 (Illustrious 18)
-    if(myTotal === 15 && dealerValue === 10) {
-      if(tc >= ILLUSTRIOUS_18['15v10']) {
-        return { action: 'STAND', emoji: '✋', reason: `15 vs 10 TC≥+${ILLUSTRIOUS_18['15v10']} (Ill-18)` };
-      }
-      return { action: 'HIT', emoji: '👆', reason: '15 vs 10: pide' };
-    }
-    
-    // 13 vs 2/3 (Illustrious 18)
+    // Hard hands con Illustrious 18
     if(myTotal === 13) {
       if(dealerValue === 2 && tc >= ILLUSTRIOUS_18['13v2']) {
-        return { action: 'STAND', emoji: '✋', reason: `13 vs 2 TC≥${ILLUSTRIOUS_18['13v2']} (Ill-18)` };
+        return { action: 'STAND', emoji: '✋', reason: `13v2 TC≥${ILLUSTRIOUS_18['13v2']}: plantarse (Ill-18)`, index: ILLUSTRIOUS_18['13v2'] };
       }
       if(dealerValue === 3 && tc >= ILLUSTRIOUS_18['13v3']) {
-        return { action: 'STAND', emoji: '✋', reason: `13 vs 3 TC≥${ILLUSTRIOUS_18['13v3']} (Ill-18)` };
+        return { action: 'STAND', emoji: '✋', reason: `13v3 TC≥${ILLUSTRIOUS_18['13v3']}: plantarse (Ill-18)`, index: ILLUSTRIOUS_18['13v3'] };
+      }
+      if(dealerValue >= 2 && dealerValue <= 6) {
+        return { action: 'STAND', emoji: '✋', reason: '13 vs débil: dealer puede buscar', index: null };
       }
     }
-    
-    // 12 vs 2-6 (Illustrious 18)
     if(myTotal === 12) {
       if(dealerValue === 2 && tc >= ILLUSTRIOUS_18['12v2']) {
-        return { action: 'STAND', emoji: '✋', reason: `12 vs 2 TC≥+${ILLUSTRIOUS_18['12v2']} (Ill-18)` };
+        return { action: 'STAND', emoji: '✋', reason: `12v2 TC≥+${ILLUSTRIOUS_18['12v2']}: plantarse (Ill-18)`, index: ILLUSTRIOUS_18['12v2'] };
       }
       if(dealerValue === 3 && tc >= ILLUSTRIOUS_18['12v3']) {
-        return { action: 'STAND', emoji: '✋', reason: `12 vs 3 TC≥+${ILLUSTRIOUS_18['12v3']} (Ill-18)` };
+        return { action: 'STAND', emoji: '✋', reason: `12v3 TC≥+${ILLUSTRIOUS_18['12v3']}: plantarse (Ill-18)`, index: ILLUSTRIOUS_18['12v3'] };
+      }
+      if(dealerValue === 4 && tc >= ILLUSTRIOUS_18['12v4']) {
+        return { action: 'STAND', emoji: '✋', reason: `12v4 TC≥${ILLUSTRIOUS_18['12v4']}: plantarse (Ill-18)`, index: ILLUSTRIOUS_18['12v4'] };
       }
       if(dealerValue >= 4 && dealerValue <= 6) {
-        return { action: 'STAND', emoji: '✋', reason: '12 vs 4-6: dealer débil' };
+        return { action: 'STAND', emoji: '✋', reason: '12 vs 4-6: dealer débil', index: null };
       }
-      return { action: 'HIT', emoji: '👆', reason: '12: pide' };
+      return { action: 'HIT', emoji: '👆', reason: '12: pide', index: null };
     }
-    
-    // 11 (Illustrious 18 + básica)
     if(myTotal === 11) {
       if(dealerCard === 'A' && tc >= ILLUSTRIOUS_18['11vA'] && playerHand.length === 2) {
-        return { action: 'DOUBLE', emoji: '💰', reason: `11 vs A TC≥+${ILLUSTRIOUS_18['11vA']} (Ill-18)` };
+        return { action: 'DOUBLE', emoji: '💰', reason: `11vA TC≥+${ILLUSTRIOUS_18['11vA']}: dobla (Ill-18)`, index: ILLUSTRIOUS_18['11vA'] };
       }
-      if(playerHand.length === 2) {
-        return { action: 'DOUBLE', emoji: '💰', reason: '11 perfecto para doblar' };
+      if(playerHand.length === 2 && dealerValue <= 10) {
+        return { action: 'DOUBLE', emoji: '💰', reason: '11 perfecto para doblar', index: null };
       }
-      return { action: 'HIT', emoji: '👆', reason: '11: pide' };
+      return { action: 'HIT', emoji: '👆', reason: '11: pide', index: null };
     }
-    
-    // 10 (Illustrious 18)
     if(myTotal === 10 && playerHand.length === 2) {
       if(dealerValue === 10 && tc >= ILLUSTRIOUS_18['10v10']) {
-        return { action: 'DOUBLE', emoji: '💰', reason: `10 vs 10 TC≥+${ILLUSTRIOUS_18['10v10']} (Ill-18)` };
+        return { action: 'DOUBLE', emoji: '💰', reason: `10v10 TC≥+${ILLUSTRIOUS_18['10v10']}: dobla (Ill-18)`, index: ILLUSTRIOUS_18['10v10'] };
       }
       if(dealerCard === 'A' && tc >= ILLUSTRIOUS_18['10vA']) {
-        return { action: 'DOUBLE', emoji: '💰', reason: `10 vs A TC≥+${ILLUSTRIOUS_18['10vA']} (Ill-18)` };
+        return { action: 'DOUBLE', emoji: '💰', reason: `10vA TC≥+${ILLUSTRIOUS_18['10vA']}: dobla (Ill-18)`, index: ILLUSTRIOUS_18['10vA'] };
       }
       if(dealerValue >= 2 && dealerValue <= 9) {
-        return { action: 'DOUBLE', emoji: '💰', reason: '10 vs 2-9: dobla' };
+        return { action: 'DOUBLE', emoji: '💰', reason: '10 vs 2-9: dobla', index: null };
       }
     }
-    
-    // 9 (Illustrious 18)
     if(myTotal === 9 && playerHand.length === 2) {
       if(dealerValue === 2 && tc >= ILLUSTRIOUS_18['9v2']) {
-        return { action: 'DOUBLE', emoji: '💰', reason: `9 vs 2 TC≥+${ILLUSTRIOUS_18['9v2']} (Ill-18)` };
+        return { action: 'DOUBLE', emoji: '💰', reason: `9v2 TC≥+${ILLUSTRIOUS_18['9v2']}: dobla (Ill-18)`, index: ILLUSTRIOUS_18['9v2'] };
       }
       if(dealerValue === 7 && tc >= ILLUSTRIOUS_18['9v7']) {
-        return { action: 'DOUBLE', emoji: '💰', reason: `9 vs 7 TC≥+${ILLUSTRIOUS_18['9v7']} (Ill-18)` };
+        return { action: 'DOUBLE', emoji: '💰', reason: `9v7 TC≥+${ILLUSTRIOUS_18['9v7']}: dobla (Ill-18)`, index: ILLUSTRIOUS_18['9v7'] };
       }
       if(dealerValue >= 3 && dealerValue <= 6) {
-        return { action: 'DOUBLE', emoji: '💰', reason: '9 vs 3-6: dobla' };
+        return { action: 'DOUBLE', emoji: '💰', reason: '9 vs 3-6: dobla', index: null };
       }
     }
-    
-    // 17+
-    if(myTotal >= 17) {
-      return { action: 'STAND', emoji: '✋', reason: '17+ seguro' };
-    }
-    
-    // 13-16
+    if(myTotal >= 17) return { action: 'STAND', emoji: '✋', reason: '17+ seguro', index: null };
     if(myTotal >= 13 && myTotal <= 16) {
       if(dealerValue >= 2 && dealerValue <= 6) {
-        return { action: 'STAND', emoji: '✋', reason: 'Dealer débil: puede bustearse' };
+        return { action: 'STAND', emoji: '✋', reason: 'Dealer débil: puede buscar', index: null };
       }
-      return { action: 'HIT', emoji: '👆', reason: 'Dealer fuerte: mejora' };
+      return { action: 'HIT', emoji: '👆', reason: 'Dealer fuerte: mejora', index: null };
     }
-    
-    return { action: 'HIT', emoji: '👆', reason: 'Total bajo: pide' };
+    return { action: 'HIT', emoji: '👆', reason: 'Total bajo: pide', index: null };
   }
   
   static handValue(hand) {
@@ -560,325 +592,208 @@ class Strategy {
   }
 }
 
-// 10. SIMULATOR (Auto-play)
-class Simulator {
-  static async playHand() {
-    // Reparto inicial
-    const playerCards = [shoe.draw(), shoe.draw()];
-    const dealerCards = [shoe.draw()];
-    
-    state.lastHand = { player: playerCards, dealer: dealerCards };
-    
-    // Contar cartas
-    playerCards.forEach(c => Counter.updateCount(c));
-    dealerCards.forEach(c => Counter.updateCount(c));
-    
-    const tc = Counter.trueCount(state.runningCount, state.cardsPlayed, shoe.totalCards);
-    const bet = Bankroll.getBet(tc);
-    
-    // Decisión del jugador
-    let strategy = Strategy.getOptimalPlay(playerCards, dealerCards[0], tc);
-    
-    // Humanizer: ¿error intencional?
-    if(Humanizer.shouldMakeError(tc, bet, state.handsPlayed)) {
-      strategy.action = Humanizer.introduceError(strategy.action);
-      strategy.reason += ' (ERROR HUMANO)';
-    }
-    
-    // Completar dealer
-    while(Strategy.handValue(dealerCards) < 17) {
-      const card = shoe.draw();
-      dealerCards.push(card);
-      Counter.updateCount(card);
-    }
-    
-    // Resultado
-    const playerTotal = Strategy.handValue(playerCards);
-    const dealerTotal = Strategy.handValue(dealerCards);
-    
-    let result = 'PUSH';
-    if(playerTotal > 21) {
-      result = 'LOSE';
-      Bankroll.lose(bet);
-    } else if(dealerTotal > 21) {
-      result = 'WIN';
-      Bankroll.win(bet);
-    } else if(playerTotal > dealerTotal) {
-      result = 'WIN';
-      Bankroll.win(bet);
-    } else if(playerTotal < dealerTotal) {
-      result = 'LOSE';
-      Bankroll.lose(bet);
-    } else {
-      Bankroll.push();
-    }
-    
-    state.handsPlayed++;
-    
-    logEntry(`Mano #${state.handsPlayed}: ${result} | ${playerCards.join(',')} vs ${dealerCards.join(',')} | Apuesta: $${bet} | TC: ${tc}`);
-    
-    // Check shuffle
-    if(shoe.needsShuffle(RULES.penetration)) {
-      showAlert('🔄 SHUFFLE DETECTADO - Penetración alcanzada');
-    }
-    
-    return { result, playerCards, dealerCards, bet, tc, strategy };
+class Humanizer {
+  static shouldMakeError(tc, bet) {
+    if(!CONFIG.enableHumanizer) return false;
+    let errorProb = CONFIG.errorRate / 100;
+    if(tc <= 0) errorProb *= 1.8;
+    if(state.handsPlayed > 150) errorProb *= 1.3;
+    if(bet > CONFIG.minBet * 6) errorProb *= 0.3;
+    if(tc >= 4) errorProb = 0;
+    return Math.random() < errorProb;
+  }
+  
+  static introduceError(optimalAction) {
+    const alternatives = {
+      'HIT': ['STAND'],
+      'STAND': ['HIT'],
+      'DOUBLE': ['HIT'],
+      'SPLIT': ['HIT']
+    };
+    const options = alternatives[optimalAction] || ['STAND'];
+    return options[Math.floor(Math.random() * options.length)];
   }
 }
 
-// ==================== UI FUNCTIONS ====================
+function initializePlayers() {
+  state.players = [];
+  for(let i = 1; i <= CONFIG.numPlayers; i++) {
+    state.players.push({
+      id: i,
+      cards: [],
+      isYou: i === CONFIG.yourPosition
+    });
+  }
+  renderPlayers();
+}
 
-function renderCards() {
-  const grid = document.getElementById('cardGrid');
-  grid.innerHTML = '';
-  
+function renderPlayers() {
+  const area = document.getElementById('playersArea');
+  area.innerHTML = '';
+  state.players.forEach(player => {
+    const div = document.createElement('div');
+    div.className = 'player-box' + (player.isYou ? ' you' : '');
+    div.id = `player${player.id}`;
+    div.innerHTML = `
+      <div class="player-title">
+        <span>${player.isYou ? '👤 TÚ' : `Jugador ${player.id}`}</span>
+        <span style="font-size:12px; opacity:0.7;">Pos. ${player.id}</span>
+      </div>
+      <div class="player-cards" id="player${player.id}Cards"></div>
+      <div class="player-total" id="player${player.id}Total"></div>
+    `;
+    area.appendChild(div);
+  });
+}
+
+function renderCardSelector() {
+  const selector = document.getElementById('cardSelector');
+  selector.innerHTML = '';
   ALL_CARDS.forEach(card => {
     const btn = document.createElement('button');
-    btn.className = 'card';
+    btn.className = 'card-btn';
     btn.textContent = card;
-    btn.onclick = () => seeCard(card);
-    
+    btn.onclick = () => registerCard(card);
     const val = HI_LO[card];
     if(val > 0) btn.classList.add('low');
     else if(val < 0) btn.classList.add('high');
     else btn.classList.add('mid');
-    
-    grid.appendChild(btn);
+    selector.appendChild(btn);
   });
 }
 
-function seeCard(card) {
-  Counter.updateCount(card);
-  state.lastHand.player.push(card);
-  
-  logEntry(`Carta vista: ${card} | RC=${state.runningCount > 0 ? '+' + state.runningCount : state.runningCount}`);
-  
-  if(navigator.vibrate) navigator.vibrate(5);
-  
-  saveState();
-  updateUI();
+function setRegisterMode(mode) {
+  state.registerMode = mode;
+  const texts = {
+    myCard: '👤 Registrando: TUS CARTAS',
+    tableCard: '👥 Registrando: OTROS JUGADORES',
+    dealerCard: '🎴 Registrando: DEALER VISIBLE'
+  };
+  document.getElementById('registerModeText').textContent = texts[mode];
+  document.getElementById('phaseIndicator').textContent = texts[mode];
 }
 
-function updateUI() {
-  const tc = Counter.trueCount(state.runningCount, state.cardsPlayed, shoe.totalCards);
-  const bet = Bankroll.getBet(tc);
-  const penetration = Math.round((state.cardsPlayed / shoe.totalCards) * 100);
-  
-  // Stats
-  const rcEl = document.getElementById('rc');
-  rcEl.textContent = state.runningCount > 0 ? '+' + state.runningCount : state.runningCount;
-  rcEl.className = 'stat-value';
-  if(state.runningCount > 0) rcEl.classList.add('positive');
-  else if(state.runningCount < 0) rcEl.classList.add('negative');
-  else rcEl.classList.add('neutral');
-  
-  const tcEl = document.getElementById('tc');
-  tcEl.textContent = tc > 0 ? '+' + tc : tc;
-  tcEl.className = 'stat-value';
-  if(tc > 0) tcEl.classList.add('positive');
-  else if(tc < 0) tcEl.classList.add('negative');
-  else tcEl.classList.add('neutral');
-  
-  document.getElementById('bet').textContent = '$' + bet;
-  
-  const bankEl = document.getElementById('bank');
-  bankEl.textContent = '$' + Math.round(state.currentBankroll);
-  bankEl.className = 'stat-value';
-  if(state.currentBankroll > RULES.bankroll) bankEl.classList.add('positive');
-  else if(state.currentBankroll < RULES.bankroll) bankEl.classList.add('negative');
-  else bankEl.classList.add('neutral');
-  
-  const penEl = document.getElementById('penetration');
-  penEl.textContent = penetration + '%';
-  penEl.className = 'stat-value';
-  if(penetration >= RULES.penetration * 100) penEl.classList.add('warning');
-  else penEl.classList.add('neutral');
-  
-  document.getElementById('mode').textContent = state.autoMode ? 'AUTO' : 'Manual';
-  
-  // Session stats
-  document.getElementById('totalHands').textContent = state.handsPlayed;
-  
-  const profit = state.currentBankroll - RULES.bankroll;
-  const profitEl = document.getElementById('profit');
-  profitEl.textContent = (profit >= 0 ? '+' : '') + '$' + Math.round(profit);
-  profitEl.style.color = profit >= 0 ? '#4ade80' : '#ef4444';
-  
-  const winRate = state.handsPlayed > 0 ? Math.round((state.handsWon / state.handsPlayed) * 100) : 0;
-  document.getElementById('winRate').textContent = winRate + '%';
-  
-  // AI Advice
-  updateAI();
-  
-  // Log
-  updateLog();
-}
-
-function updateAI() {
-  if(state.lastHand.player.length === 0 || state.lastHand.dealer.length === 0) {
-    document.getElementById('aiAction').textContent = 'Esperando cartas...';
-    document.getElementById('aiReason').textContent = 'Registra cartas para ver recomendaciones';
+function registerCard(card) {
+  if(!state.registerMode) {
+    alert('⚠️ Primero selecciona un modo: MI CARTA, CARTA MESA o CARTA DEALER');
     return;
   }
   
-  const tc = Counter.trueCount(state.runningCount, state.cardsPlayed, shoe.totalCards);
-  const strategy = Strategy.getOptimalPlay(state.lastHand.player, state.lastHand.dealer[0], tc);
+  Counter.updateCount(card);
   
-  document.getElementById('aiAction').textContent = strategy.emoji + ' ' + strategy.action;
-  document.getElementById('aiReason').textContent = strategy.reason;
-}
-
-function logEntry(text) {
-  const timestamp = new Date().toLocaleTimeString('es-CO');
-  state.gameLog.push(`[${timestamp}] ${text}`);
-  if(state.gameLog.length > 100) state.gameLog.shift();
-}
-
-function updateLog() {
-  const logEl = document.getElementById('log');
-  logEl.innerHTML = state.gameLog.map(entry => 
-    `<div class="log-entry">${entry}</div>`
-  ).reverse().join('');
-}
-
-function showAlert(text) {
-  document.getElementById('alert').classList.remove('hidden');
-  document.getElementById('alertText').textContent = text;
-  setTimeout(() => document.getElementById('alert').classList.add('hidden'), 5000);
-}
-
-// ==================== ACTIONS ====================
-
-async function toggleAuto() {
-  state.autoMode = !state.autoMode;
-  updateUI();
-  
-  if(state.autoMode) {
-    logEntry('🤖 MODO AUTO-SIMULACIÓN ACTIVADO');
-    autoLoop();
+  if(state.registerMode === 'myCard') {
+    state.myCards.push(card);
+    const myPlayer = state.players.find(p => p.isYou);
+    myPlayer.cards.push(card);
+    logEntry(`👤 Tu carta: ${card} | RC=${state.runningCount > 0 ? '+' : ''}${state.runningCount}`, 'success');
+  } else if(state.registerMode === 'dealerCard') {
+    state.dealer.cards.push(card);
+    if(!state.dealer.visibleCard) state.dealer.visibleCard = card;
+    logEntry(`🎴 Dealer muestra: ${card} | RC=${state.runningCount > 0 ? '+' : ''}${state.runningCount}`, 'warning');
   } else {
-    logEntry('⏸️ Modo manual activado');
+    logEntry(`👥 Carta mesa: ${card} | RC=${state.runningCount > 0 ? '+' : ''}${state.runningCount}`, '');
   }
+  
+  if(navigator.vibrate) navigator.vibrate(10);
+  updateUI();
+  calculateDecision();
 }
 
-async function autoLoop() {
-  if(!state.autoMode) return;
+function calculateDecision() {
+  if(state.myCards.length === 0 || !state.dealer.visibleCard) {
+    document.getElementById('aiAction').textContent = '⏳ Datos incompletos';
+    document.getElementById('aiReason').textContent = 'Registra tus cartas y la carta visible del dealer';
+    return;
+  }
   
-  const result = await Simulator.playHand();
-  updateUI();
+  const tc = Counter.trueCount();
+  const bet = BetManager.getSuggestedBet(tc);
+  const strategy = Strategy.getOptimalPlay(state.myCards, state.dealer.visibleCard, tc);
   
-  // Delay entre manos (300ms = rápido pero observable)
-  setTimeout(autoLoop, 300);
+  let finalAction = strategy.action;
+  let isError = false;
+  
+  if(Humanizer.shouldMakeError(tc, bet)) {
+    const original = strategy.action;
+    finalAction = Humanizer.introduceError(original);
+    isError = true;
+    state.humanErrors++;
+    const msg = `🎭 CAMUFLAJE: Se recomienda "${finalAction}" en lugar de "${original}" para evitar detección`;
+    showHumanizerAlert(msg);
+    logEntry(msg, 'warning');
+    strategy.reason = `${strategy.reason} (⚠️ CAMUFLAJE ACTIVO)`;
+  }
+  
+  document.getElementById('aiAction').textContent = strategy.emoji + ' ' + finalAction;
+  document.getElementById('aiReason').textContent = strategy.reason;
+  document.getElementById('aiDecision').textContent = finalAction;
+  document.getElementById('aiIndex').textContent = strategy.index !== null ? strategy.index : '-';
+  document.getElementById('aiConfidence').textContent = isError ? '⚠️ CAMUFLAJE' : '100%';
+  
+  logEntry(`🧠 Decisión: ${finalAction} | ${strategy.reason}`, 'success');
 }
 
 function newHand() {
-  state.lastHand = { player: [], dealer: [] };
-  logEntry('⏭️ Nueva mano iniciada');
+  state.myCards = [];
+  state.dealer = { cards: [], visibleCard: null };
+  state.players.forEach(p => p.cards = []);
+  state.registerMode = null;
+  state.handsPlayed++;
+  
+  document.getElementById('phaseIndicator').textContent = '🆕 Nueva mano - Registra el reparto inicial';
+  document.getElementById('aiAction').textContent = '⏳ Esperando cartas...';
+  document.getElementById('aiReason').textContent = 'Registra las cartas del reparto';
+  document.getElementById('registerModeText').textContent = 'Selecciona un modo arriba';
+  
+  logEntry(`🆕 NUEVA MANO #${state.handsPlayed}`, 'success');
+  
+  if(shoe.needsShuffle(CONFIG.penetration)) {
+    logEntry('⚠️ SHUFFLE recomendado - penetración alcanzada', 'warning');
+  }
+  
   updateUI();
 }
 
 function shuffle() {
-  if(!confirm('¿Confirmar SHUFFLE? Esto reseteará RC y cartas jugadas.')) return;
-  
+  if(!confirm('¿Confirmar SHUFFLE?')) return;
   state.runningCount = 0;
   state.cardsPlayed = 0;
   shoe.reset();
-  
-  logEntry('🔄 SHUFFLE - Conteo reseteado a 0');
-  showAlert('🔄 SHUFFLE completado - Zapato mezclado');
-  
-  saveState();
+  logEntry('🔄 SHUFFLE completado - Conteo reseteado', 'success');
   updateUI();
 }
 
 function resetAll() {
-  if(!confirm('¿RESET TOTAL? Borra TODO: conteo, bankroll, historial.')) return;
-  
+  if(!confirm('¿RESET TOTAL? Borra todo el progreso')) return;
   state = {
     runningCount: 0,
     cardsPlayed: 0,
-    currentBankroll: RULES.bankroll,
+    currentBankroll: CONFIG.bankroll,
     handsPlayed: 0,
     handsWon: 0,
     handsLost: 0,
-    autoMode: false,
-    gameLog: [],
-    lastHand: { player: [], dealer: [] }
+    handsPush: 0,
+    humanErrors: 0,
+    registerMode: null,
+    currentPhase: 'waiting',
+    players: [],
+    dealer: { cards: [], visibleCard: null },
+    myCards: [],
+    gameLog: []
   };
-  
   shoe.reset();
-  localStorage.removeItem('bjState');
-  
-  logEntry('💣 RESET TOTAL - Sistema reiniciado');
+  initializePlayers();
+  logEntry('💣 RESET COMPLETO', 'success');
   updateUI();
 }
 
-function updateConfig() {
-  RULES.decks = parseInt(document.getElementById('numDecks').value);
-  RULES.penetration = parseInt(document.getElementById('penetrationPct').value) / 100;
-  RULES.bankroll = parseFloat(document.getElementById('initialBank').value);
-  RULES.minBet = parseFloat(document.getElementById('minBet').value);
-  RULES.playMode = document.getElementById('playMode').value;
-  RULES.errorRate = parseInt(document.getElementById('errorRate').value);
-  RULES.dealerHitsSoft17 = document.getElementById('dealerHitsSoft17').checked;
-  RULES.doubleAfterSplit = document.getElementById('doubleAfterSplit').checked;
-  RULES.surrender = document.getElementById('surrender').checked;
-  RULES.resplitAces = document.getElementById('resplitAces').checked;
+function updateUI() {
+  const tc = Counter.trueCount();
+  const bet = BetManager.getSuggestedBet(tc);
+  const edge = Counter.calculateEdge(tc);
+  const penetration = Math.round((state.cardsPlayed / shoe.totalCards) * 100);
   
-  shoe = new Shoe(RULES.decks);
-  state.currentBankroll = RULES.bankroll;
-  
-  saveConfig();
-  logEntry('⚙️ Configuración actualizada');
-  updateUI();
-}
-
-// ==================== PERSISTENCE ====================
-
-function saveState() {
-  localStorage.setItem('bjState', JSON.stringify(state));
-}
-
-function loadState() {
-  const saved = localStorage.getItem('bjState');
-  if(saved) {
-    state = JSON.parse(saved);
-  }
-}
-
-function saveConfig() {
-  localStorage.setItem('bjConfig', JSON.stringify(RULES));
-}
-
-function loadConfig() {
-  const saved = localStorage.getItem('bjConfig');
-  if(saved) {
-    const config = JSON.parse(saved);
-    Object.assign(RULES, config);
+  const rcEl = document.getElementById('rc');
+  rcEl.textContent = state.runningCount > 0 ? '+' + state.runningCount : state.runningCount;
+  rcEl.className = 'stat
     
-    // Sync UI
-    document.getElementById('numDecks').value = RULES.decks;
-    document.getElementById('penetrationPct').value = RULES.penetration * 100;
-    document.getElementById('initialBank').value = RULES.bankroll;
-    document.getElementById('minBet').value = RULES.minBet;
-    document.getElementById('playMode').value = RULES.playMode;
-    document.getElementById('errorRate').value = RULES.errorRate;
-    document.getElementById('dealerHitsSoft17').checked = RULES.dealerHitsSoft17;
-    document.getElementById('doubleAfterSplit').checked = RULES.doubleAfterSplit;
-    document.getElementById('surrender').checked = RULES.surrender;
-    document.getElementById('resplitAces').checked = RULES.resplitAces;
-  }
-}
-
-// ==================== INIT ====================
-
-loadConfig();
-loadState();
-renderCards();
-updateUI();
-
-logEntry('✅ Sistema cargado - Blackjack Counter Pro v2.0');
-logEntry(`📊 Config: ${RULES.decks} mazos, ${Math.round(RULES.penetration*100)}% penetración, Modo ${RULES.playMode}`);
-</script>
-</body>
-</html>
